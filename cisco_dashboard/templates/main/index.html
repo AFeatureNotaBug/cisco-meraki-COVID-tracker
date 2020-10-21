@@ -1,0 +1,26 @@
+{% extends 'main/base.html' %}
+{% load staticfiles %}
+{% block body_block %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm text-center">
+            <h3>Top Rated</h3>
+            {% if example_text %}
+            {{ example_text }}
+            {% else %}
+            No example text
+            {% endif %}
+            <br>
+            <h4>Playground</h4>
+            <ul class="list-group">
+                <a href='/ben'><li class="list-group-item">Ben</li></a>
+                <a href='/fraser'><li class="list-group-item">Fraser</li></a>
+                <a href='/jake'><li class="list-group-item">Jake</li></a>
+                <a href='/johnathan'><li class="list-group-item">Johnathan</li></a>
+                <a href='/ruofan'><li class="list-group-item">Ruofan</li></a>
+            </ul>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
