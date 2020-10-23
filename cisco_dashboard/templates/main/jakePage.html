@@ -1,0 +1,16 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block body_block %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm text-center">
+            <h3>Jake's Test Page</h3>
+            <br>
+			
+            <img src = "data:image/png;base64,{{ test|safe }}">
+
+        </div>
+    </div>
+</div>
+{% endblock %}
