@@ -5,21 +5,23 @@
 <div class="container">
     <div class="row">
         <div class="col-sm text-center">
-            <h3>Jake's Test Page</h3>
-            <br>
-			
-            <img src = "data:image/png;base64,{{ test|safe }}">
+            <h3>{{ org.orgName }}</h3>
 			<br />
 			
-			<h3>Organisations:</h3>
+			Organisation ID: {{ org.orgID }}
+			<br />
+			Organisation URL: {{ org.orgURL }}
+			<br />
+			
+			<h3>Networks:</h3>
+			<br />
 			<ul class="list-group">
-			{% for org in orgs%}
+			{% for n in net%}
 				<a href="{% url 'show_org' org.slug %}">
-					{{ org.orgName }} ({{ org.orgID }})
+					{{ n.netName }} ({{ n.netID }})
 				</a><br />
 			{% endfor %}
 			</ul>
-			
         </div>
     </div>
 </div>

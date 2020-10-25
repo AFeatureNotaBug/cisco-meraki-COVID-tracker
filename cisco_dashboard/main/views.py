@@ -6,6 +6,11 @@ from django.template import RequestContext
 import matplotlib.pyplot as plt
 from random import randint as r
 import io, urllib, base64
+
+import meraki
+from main.models import Organisation
+from main.models import Network
+
 # Create your views here.
 def index(request):
     #return HttpResponse("Hello, world. You're at the main index.")
@@ -20,8 +25,8 @@ def ben(request):
 
 def fraser(request):
     return HttpResponse("Fraser's page...")
-
-
+    
+    
 def jake(request):
     dataX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     dataY = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -42,7 +47,24 @@ def jake(request):
     graphAsPNG = base64.b64encode(graphAsPNG)
     graphAsPNG = graphAsPNG.decode('utf-8')
     
-    return render(request, 'main/jakePage.html', context = {'test': graphAsPNG})
+    context_dict = {
+        'test': graphAsPNG,
+        'orgs': Organisation.objects.all()
+    }
+    
+    return render(request, 'main/jakePage.html', context = context_dict)
+
+
+def showOrg(request, name_slug):
+    organisation = Organisation.objects.get(slug=name_slug)
+    networks = Network.objects.filter(org = organisation)
+    
+    context_dict = {
+        'org': organisation,
+        'net': networks
+    }
+    
+    return render(request, "main/orgPage.html", context = context_dict)
 
 
 def johnathan(request):
