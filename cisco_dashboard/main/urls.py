@@ -9,4 +9,6 @@ urlpatterns = [
     path('jake', views.jake, name='jake'),
     path('johnathan', views.johnathan, name='johnathan'),
     path('ruofan', views.ruofan, name='ruofan'),
+    
+    path('<slug:name_slug>', views.showOrg, name = "show_org"),
 ]
