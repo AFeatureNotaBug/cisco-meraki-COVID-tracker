@@ -1,0 +1,20 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block body_block %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm text-center">
+            <h3>Fraser's Page</h3>
+            <h5>Organisations json</h5>
+            {% if organisations %}
+            <h5>Organisations: {{organisations.meta.number}}</h5>
+            <pre><code>{{organisations.data}}</code></pre>
+            {% else %}
+            No organisations
+            {% endif %}
+            
+
+        </div>
+    </div>
+</div>
+{% endblock %}
