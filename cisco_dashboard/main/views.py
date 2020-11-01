@@ -19,7 +19,7 @@ def jake(request):
     return HttpResponse("Jake's page...")
 
 def johnathan(request):
-    return HttpResponse("Johnathan's page...")
+    return HttpResponse("Johnathan's page... Test")
 
 def ruofan(request):
     return HttpResponse("Ruofan's page...")
