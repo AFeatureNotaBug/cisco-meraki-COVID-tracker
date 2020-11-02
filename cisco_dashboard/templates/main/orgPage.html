@@ -1,0 +1,28 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block body_block %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm text-center">
+            <h3>{{ org.orgName }}</h3>
+			<br />
+			
+			Organisation ID: {{ org.orgID }}
+			<br />
+			Organisation URL: {{ org.orgURL }}
+			<br />
+			
+			<h3>Networks:</h3>
+			<br />
+			<ul class="list-group">
+			{% for n in net%}
+				<a href="{% url 'show_org' org.slug %}">
+					{{ n.netName }} ({{ n.netID }})
+				</a><br />
+			{% endfor %}
+			</ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

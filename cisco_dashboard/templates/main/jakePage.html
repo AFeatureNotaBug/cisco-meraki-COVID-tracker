@@ -1,0 +1,26 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block body_block %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm text-center">
+            <h3>Jake's Test Page</h3>
+            <br>
+			
+            <img src = "data:image/png;base64,{{ test|safe }}">
+			<br />
+			
+			<h3>Organisations:</h3>
+			<ul class="list-group">
+			{% for org in orgs%}
+				<a href="{% url 'show_org' org.slug %}">
+					{{ org.orgName }} ({{ org.orgID }})
+				</a><br />
+			{% endfor %}
+			</ul>
+			
+        </div>
+    </div>
+</div>
+{% endblock %}
