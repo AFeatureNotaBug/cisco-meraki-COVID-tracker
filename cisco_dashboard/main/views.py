@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 from random import randint as r
 import io, urllib, base64
 
+from django.shortcuts import render, redirect
+from .forms import RegisterForm
+
 import meraki
 from main.models import Organisation
 from main.models import Network
@@ -69,6 +72,19 @@ def showOrg(request, name_slug):
 
 def johnathan(request):
     return HttpResponse("Johnathan's page... Test")
+
+# View for register page
+def register(response):
+    if response.method == "POST":
+	form = RegisterForm(response.POST)
+	if form.is_valid():
+	    form.save()
+
+	return redirect("/home")
+    else:
+	form = RegisterForm()
+
+    return render(response, "register/register.html", {"form":form})
 
 
 def ruofan(request):
