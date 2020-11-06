@@ -70,18 +70,6 @@ def showOrg(request, org_slug):
     }
     
     return render(request, "main/orgPage.html", context = context_dict)
-
-
-def showNet(request, org_slug, net_slug):
-    network = Network.objects.get(slug = net_slug)
-    devices = Device.objects.filter(net = network)
-    
-    context_dict = {
-        'net': network,
-        'devices': devices
-    }
-    
-    return render(request, "main/netPage.html", context = context_dict)
     
 
 def johnathan(request):

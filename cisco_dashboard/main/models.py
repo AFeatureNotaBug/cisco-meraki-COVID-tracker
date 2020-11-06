@@ -1,6 +1,4 @@
 from django.db import models
-
-
 from django.template.defaultfilters import slugify
 
 
@@ -9,7 +7,7 @@ class Organisation(models.Model):
     orgID   = models.CharField(max_length = 200)
     orgName = models.CharField(max_length = 200)
     orgURL  = models.CharField(max_length = 200)
-    orgAPIOverview = models.JSONField(default=list)
+    #orgAPIOverview = models.JSONField(default=list)
     
     slug    = models.SlugField(unique = True, default = "")
     
