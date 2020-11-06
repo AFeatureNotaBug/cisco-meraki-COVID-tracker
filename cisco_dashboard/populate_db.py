@@ -7,7 +7,9 @@ django.setup()
 from main.models import Organisation, Network
 
 
-API_KEY = "6bec40cf957de430a6f1f2baa056b99a4fac9ea0"
+API_KEY = os.environ['X_Cisco_Meraki_API_Key']
+
+meraki.DEFAULT_BASE_URL = os.environ['base_Url']
 
 dash = meraki.DashboardAPI(API_KEY)
 GETorgs = dash.organizations.getOrganizations() #Get all organizations
