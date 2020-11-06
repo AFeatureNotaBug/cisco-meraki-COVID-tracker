@@ -1,11 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import RequestContext
-
+from django.core import serializers
 
 import matplotlib.pyplot as plt
 from random import randint as r
 import io, urllib, base64
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+
 
 import meraki
 from main.models import Organisation, Network, Device
@@ -23,7 +26,9 @@ def ben(request):
 
 
 def fraser(request):
-    return HttpResponse("Fraser's page...")
+    #print(serializers.serialize('json', [Organisation.objects.all(),]))
+    tmpObj = json.loads(serializers.serialize("json",Organisation.objects.all()))
+    return render(request, 'main/fraser.html', context = {'organisations':{'data':json.dumps(tmpObj, indent=4, sort_keys=True),'meta':{'number':len(Organisation.objects.all())}}})
     
     
 def jake(request):
