@@ -4,7 +4,7 @@ import django, os, random
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cisco_dashboard.settings')
 django.setup()
 
-from main.models import Organisation, Network
+from main.models import Organisation, Network, Device
 
 
 API_KEY = os.environ['X_Cisco_Meraki_API_Key']
@@ -36,3 +36,22 @@ for org in GETorgs:
             netName = net['name']
         )
         newNet.save()
+        
+        GETdevs = dash.networks.getNetworkDevices(net['id'])
+        
+        for device in GETdevs:
+            newDevice = Device.objects.create(
+                net = newNet,
+                
+                devAddr   = device['address'],
+                
+                devSerial = device['serial'],
+                devMac    = device['mac'],
+                devModel  = device['model'],
+                #devLanIP  = device['lanIp'],
+                
+                devLat    = device['lat'],
+                devLong   = device['lng']
+            )
+            newDevice.save()
+

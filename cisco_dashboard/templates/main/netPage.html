@@ -1,0 +1,21 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block page_title %}
+	<h3>{{ net.netName }}</h3>
+	Network ID: {{ net.netID }}
+	<br />
+{% endblock %}
+
+{% block sidebar_block %}
+	<h3>Devices:</h3>
+	<ul class="list-group list-group-flush">
+		{% for device in devices%}
+			<li>{{ device.devMac }}</li>
+		{% endfor %}
+	</ul>
+{% endblock %}
+
+{% block body_block %}
+	<p>Analysis here<p>
+{% endblock%}

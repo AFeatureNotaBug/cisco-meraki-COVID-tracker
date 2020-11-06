@@ -13,22 +13,31 @@
     <title>
         Cisco Dashboard
     </title>
+	
+	<link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" />
 </head>
 
 <body>
-    <a href='/'>
-        <h1>Cisco Dashboard</h1>
-    </a>
+	<a href='/'><h1>Cisco Dashboard</h1></a><br />
+	
+	<div class="container-fluid">
+		{% block page_title %}{% endblock %}
+		
+		<div class="row">
+			<div class="col-">
+				{% block sidebar_block%}
+				{% endblock %}
+			</div>
+			
+			<div class="col text-wrap">
+				{% block body_block %}
+				{% endblock %}
+			</div>
+		</div>
+	</div>
 
-    <main role="main" class="container">
-
-        <div>
-            {% block body_block %}
-            {% endblock %}
-        </div>
-
-    </main>
-
+	
+	
     <footer class="footer fixed-bottom footer-color">
         <div class="container">
             <div class="row vertical-middle">
@@ -36,10 +45,8 @@
                     <a href='/main/about'>about</a>
                     |
                     <a href='/main/other'>other</a>
-                    
                 </div>
             </div>
-
         </div>
     </footer>
     <!-- /.container -->
