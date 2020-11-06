@@ -28,3 +28,26 @@ class Network(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.netID)
         super(Network, self).save(*args, **kwargs)
+
+
+class Device(models.Model):
+    net       = models.ForeignKey(Network, on_delete = models.CASCADE)
+    
+    #devName   = models.CharField(max_length = 200)
+    #devNotes  = models.CharField(max_length = 200)
+    devAddr   = models.CharField(max_length = 200)
+    
+    devSerial = models.CharField(max_length = 200)
+    devMac    = models.CharField(max_length = 200)
+    devModel  = models.CharField(max_length = 200)
+    #devLanIP  = models.CharField(max_length = 200)
+    
+    devLat    = models.FloatField()
+    devLong   = models.FloatField()
+    
+    slug      = models.SlugField(unique = True, default = "")
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.devMac)
+        super(Device, self).save(*args, **kwargs)
+

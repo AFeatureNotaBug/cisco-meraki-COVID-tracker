@@ -1,0 +1,17 @@
+.sidenav {
+	height: 100%;
+	width: 25%;
+	margin: 0;
+	float: left;
+	position: relative;
+	box-sizing: border-box;
+}
+
+.content {
+	height: 100%;
+	width: 75%;
+	margin: 0;
+	float: left;
+	position: relative;
+	box-sizing: border-box;
+}

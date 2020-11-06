@@ -8,8 +8,7 @@ from random import randint as r
 import io, urllib, base64
 
 import meraki
-from main.models import Organisation
-from main.models import Network
+from main.models import Organisation, Network, Device
 
 # Create your views here.
 def index(request):
@@ -55,8 +54,8 @@ def jake(request):
     return render(request, 'main/jakePage.html', context = context_dict)
 
 
-def showOrg(request, name_slug):
-    organisation = Organisation.objects.get(slug=name_slug)
+def showOrg(request, org_slug):
+    organisation = Organisation.objects.get(slug = org_slug)
     networks = Network.objects.filter(org = organisation)
     
     context_dict = {
@@ -66,6 +65,18 @@ def showOrg(request, name_slug):
     
     return render(request, "main/orgPage.html", context = context_dict)
 
+
+def showNet(request, org_slug, net_slug):
+    network = Network.objects.get(slug = net_slug)
+    devices = Device.objects.filter(net = network)
+    
+    context_dict = {
+        'net': network,
+        'devices': devices
+    }
+    
+    return render(request, "main/netPage.html", context = context_dict)
+    
 
 def johnathan(request):
     return HttpResponse("Johnathan's page...")
