@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.template import RequestContext
 from django.core import serializers
 
@@ -22,7 +23,7 @@ def index(request):
 
 
 def ben(request):
-    return HttpResponse("Ben's page...")
+    return render(request, "main/benPage.html") 
 
 
 def fraser(request):
