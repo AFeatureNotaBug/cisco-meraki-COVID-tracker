@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block sidebar_block %}
+<h3 class='title'>Organisations</h3>
 	<ul class="list-group list-group-flush">
 		{% for org in orgs%}
 			<a href="{% url 'show_org' org.slug %}" class="list-group-item list-group-item-action">

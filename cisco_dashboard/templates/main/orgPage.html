@@ -6,8 +6,10 @@
 	Organisation ID: {{ org.orgID }}
 {% endblock %}
 
+
+
 {% block sidebar_block %}
-	<h3>Networks:</h3>
+	<h3 class='title'>Networks</h3>
 	<ul class="list-group list-group-flush">
 		{% for n in net%}
 			<a class="list-group-item list-group-item-action" id="{{ n.netID }}">
@@ -26,10 +28,10 @@
 	<script>
 		function testFunction(netName, netID) {
 			document.getElementById("testTitle").innerHTML = netName;
-			document.getElementById("test").innerHTML = "Network ID: " + netID;
+			document.getElementById("content").innerHTML = "Network ID: " + netID;
 		}
 	</script>
 	
 	<h3 id="testTitle">Test Data</h3>
-	<p id="test">Analysis here this is a long bit of example text to test the text wrapping functionality that should work properly but for some reason won't work at all which is very good fun. i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design </p>
+	<p id="content">Analysis here this is a long bit of example text to test the text wrapping functionality that should work properly but for some reason won't work at all which is very good fun. i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design </p>
 {% endblock %}
