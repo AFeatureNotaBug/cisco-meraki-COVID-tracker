@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from random import randint as r
 import io, urllib, base64
 import json
-from django.core.serializers.json import DjangoJSONEncoder
+#from django.core.serializers.json import DjangoJSONEncoder
 
 
 import meraki
