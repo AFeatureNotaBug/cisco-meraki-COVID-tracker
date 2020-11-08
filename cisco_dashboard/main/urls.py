@@ -10,5 +10,6 @@ urlpatterns = [
     path('johnathan', views.johnathan, name='johnathan'),
     path('ruofan', views.ruofan, name='ruofan'),
     path("register/", views.register, name="register"),
+    path('login/', views.user_login, name='login'),
     path('<slug:name_slug>', views.showOrg, name = "show_org"),
 ]

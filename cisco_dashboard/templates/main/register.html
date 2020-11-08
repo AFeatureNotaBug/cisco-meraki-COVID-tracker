@@ -1,12 +1,25 @@
-{% extends "main/base.html" %}
+{% extends 'main/base.html' %}
 
-{% block title %}Create an Account{% endblock %}
-{% load crispy_forms_tags %}
+{% block title_block %}
+	Register
+{% endblock %}
 
-{% block content %}
-    <form method="POST" class="form-group">
+{% block body_block %}
+<h1>Register here</h1>
+{% if registered %}
+<a href="{% url 'main:index' %}">Return to the index.</a><br />
+{% else %}
+<form id="user_form" method="post" action="{% url 'main:register' %}"
+	enctype="multipart/form-data">
+
 	{% csrf_token %}
-	{{ form|crispy }}
-	<button type="submit" class="btn btn-success">Register</button>
-    </form>
+
+	<!-- Display each form -->
+	{{ user_form.as_p }}
+	{{ profile_form.as_p }}
+
+	<!-- Provide a button to click to submit the form. -->
+	<input type="submit" name="submit" value="Register" />
+</form>
+{% endif %}
 {% endblock %}
