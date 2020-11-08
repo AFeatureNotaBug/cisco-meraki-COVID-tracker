@@ -9,7 +9,7 @@
 {% if registered %}
 <a href="{% url 'main:index' %}">Return to the index.</a><br />
 {% else %}
-<form id="user_form" method="post" action="{% url 'main:register' %}"
+<form id="user_form" method="post" action="{% url '/main/register' %}"
 	enctype="multipart/form-data">
 
 	{% csrf_token %}
