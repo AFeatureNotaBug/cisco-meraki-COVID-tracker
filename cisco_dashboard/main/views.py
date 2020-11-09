@@ -97,8 +97,8 @@ def johnathan(request):
 
 # View for register page
 def register(request):
-    if request.user:
-        return redirect('/profile')
+    """ if request.user:
+        return redirect('/profile') """
     registered = False
     if request.method == 'POST':
         user_form = UserForm(request.POST)
@@ -125,8 +125,8 @@ def register(request):
                             'registered': registered})
 
 def user_login(request):
-    if request.user:
-        return redirect('/profile')
+    """ if request.user:
+        return redirect('/profile') """
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -148,13 +148,16 @@ def user_login(request):
 @login_required
 def profile(request):
     tmpObj = json.loads(serializers.serialize("json",UserProfile.objects.filter(user=request.user)))
-    apikey = tmpObj[0]['fields']['apikey']
+    try:
+        apikey = tmpObj[0]['fields']['apikey']
+    except:
+        apikey = 'Not found'
     return  HttpResponse(f"Logged in.\n\nEmail: {request.user.email}\nUsername: {request.user.username}\nAPI Key: {apikey}")
     
 @login_required
 def user_logout(request):
     logout(request)
-    return redirect(reverse('rango:index'))
+    return redirect(reverse('index'))
 
 
 def ruofan(request):

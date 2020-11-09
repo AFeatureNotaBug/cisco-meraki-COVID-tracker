@@ -1,11 +1,5 @@
-
-<style>
-
-
-</style>
-
-<div class="row" id="header" style="margin:0;">
-    <div class="col-2" id='test'>
+<div class="row" id="header" style="margin:0">
+    <div class="col-2" id='holder' style="background-color: #4A5160">
         <p></p>
     </div>
 
@@ -14,7 +8,19 @@
             <h1>Cisco Dashboard</h1>
         </a>
     </div>
-    <div class="col-1" id='login_button'>
-        <p>Login</p>
+    {% if not user.is_authenticated %}
+    <div class="col-1 header_button">
+        <a href="/register"><p>Register</p></a>
     </div>
+    <div class="col-1 header_button">
+        <a href="/login"><p>Login</p></a>
+    </div>
+    {% else %}
+    <div class="col-1 header_button">
+        <a href="/profile"><p>Profile</p></a>
+    </div>
+    <div class="col-1 header_button">
+        <a href="/logout"><p>Logout</p></a>
+    </div>
+    {% endif %}
 </div>
