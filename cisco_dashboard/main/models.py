@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+from main.forms import UserForm, UserProfile
 
 
 from django.template.defaultfilters import slugify
@@ -28,3 +30,17 @@ class Network(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.netID)
         super(Network, self).save(*args, **kwargs)
+
+class UserProfile(models.Model):
+    # This line is required. Links UserProfile to a User model instance.
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # The additional attributes we wish to include.
+
+    def __str__(self):
+        return self.user.username
+
+class UserForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput())
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password',)
