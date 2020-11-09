@@ -28,7 +28,7 @@ SECRET_KEY = 'cj-4!v=ucqw)b@9hz(3a@56=@h4p=e)c%rr6*+77pkzekl!u^r'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1','uofgcisco.pythonanywhere.com']
 
 
 # Application definition

@@ -1,28 +1,37 @@
 {% extends 'main/base.html' %}
 {% load static %}
 
+{% block page_title %}
+	<h3><a href={{ org.orgURL }}>{{ org.orgName }}</a></h3>
+	Organisation ID: {{ org.orgID }}
+{% endblock %}
+
+
+
+{% block sidebar_block %}
+	<h3 class='title'>Networks</h3>
+	<ul class="list-group list-group-flush">
+		{% for n in net%}
+			<a class="list-group-item list-group-item-action" id="{{ n.netID }}">
+				{{ n.netName }}
+			</a>
+			
+			<script>
+				document.getElementById("{{ n.netID }}").onclick = function() {testFunction("{{n.netName|safe}}", "{{n.netID|safe}}")};
+			</script>
+		{% endfor %}
+	</ul>
+{% endblock %}
+
+
 {% block body_block %}
-<div class="container">
-    <div class="row">
-        <div class="col-sm text-center">
-            <h3>{{ org.orgName }}</h3>
-			<br />
-			
-			Organisation ID: {{ org.orgID }}
-			<br />
-			Organisation URL: {{ org.orgURL }}
-			<br />
-			
-			<h3>Networks:</h3>
-			<br />
-			<ul class="list-group">
-			{% for n in net%}
-				<a href="{% url 'show_org' org.slug %}">
-					{{ n.netName }} ({{ n.netID }})
-				</a><br />
-			{% endfor %}
-			</ul>
-        </div>
-    </div>
-</div>
+	<script>
+		function testFunction(netName, netID) {
+			document.getElementById("testTitle").innerHTML = netName;
+			document.getElementById("content").innerHTML = "Network ID: " + netID;
+		}
+	</script>
+	
+	<h3 id="testTitle">Test Data</h3>
+	<p id="content">Analysis here this is a long bit of example text to test the text wrapping functionality that should work properly but for some reason won't work at all which is very good fun. i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design i love web design </p>
 {% endblock %}

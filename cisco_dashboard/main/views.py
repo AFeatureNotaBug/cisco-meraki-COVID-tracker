@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.template import RequestContext
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
@@ -20,6 +21,17 @@ import meraki
 from main.models import Organisation
 from main.models import Network
 from main.models import *
+from django.core import serializers
+
+import matplotlib.pyplot as plt
+from random import randint as r
+import io, urllib, base64
+import json
+#from django.core.serializers.json import DjangoJSONEncoder
+
+
+import meraki
+from main.models import Organisation, Network, Device
 
 # Create your views here.
 def index(request):
@@ -30,11 +42,13 @@ def index(request):
 
 
 def ben(request):
-    return HttpResponse("Ben's page...")
+    return render(request, "main/benPage.html") 
 
 
 def fraser(request):
-    return HttpResponse("Fraser's page...")
+    #print(serializers.serialize('json', [Organisation.objects.all(),]))
+    tmpObj = json.loads(serializers.serialize("json",Organisation.objects.all()))
+    return render(request, 'main/fraser.html', context = {'organisations':{'data':json.dumps(tmpObj, indent=4, sort_keys=True),'meta':{'number':len(Organisation.objects.all())}}})
     
     
 def jake(request):
@@ -65,8 +79,8 @@ def jake(request):
     return render(request, 'main/jakePage.html', context = context_dict)
 
 
-def showOrg(request, name_slug):
-    organisation = Organisation.objects.get(slug=name_slug)
+def showOrg(request, org_slug):
+    organisation = Organisation.objects.get(slug = org_slug)
     networks = Network.objects.filter(org = organisation)
     
     context_dict = {
@@ -75,7 +89,7 @@ def showOrg(request, name_slug):
     }
     
     return render(request, "main/orgPage.html", context = context_dict)
-
+    
 
 def johnathan(request):
     return HttpResponse("Johnathan's page... Test")
