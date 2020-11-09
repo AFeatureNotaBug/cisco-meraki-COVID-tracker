@@ -83,7 +83,7 @@ def register(response):
     else:
 	    form = RegisterForm()
 
-    return render(response, "register/register.html", {"form":form})
+    return render(response, "main/register.html", {"form":form})
 
 
 def ruofan(request):
