@@ -1,14 +1,17 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import RequestContext
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+
+from django.core import serializers
 
 
 import matplotlib.pyplot as plt
 from random import randint as r
-import io, urllib, base64
+import io, urllib, base64,json
 
 from django.shortcuts import render, redirect
 from main.forms import UserForm, UserProfileForm
@@ -77,8 +80,11 @@ def showOrg(request, name_slug):
 def johnathan(request):
     return HttpResponse("Johnathan's page... Test")
 
+
 # View for register page
 def register(request):
+    if request.user:
+        return redirect('/profile')
     registered = False
     if request.method == 'POST':
         user_form = UserForm(request.POST)
@@ -105,6 +111,8 @@ def register(request):
                             'registered': registered})
 
 def user_login(request):
+    if request.user:
+        return redirect('/profile')
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -112,7 +120,8 @@ def user_login(request):
         if user:
             if user.is_active:
                 login(request, user)
-                return HttpResponse("Successfully logged in\napikey: " +'example' )
+                #return HttpResponse("Successfully logged in\napikey: " +'example' )
+                return redirect('/profile')
                 #return redirect(reverse('index'))
             else:
                 return HttpResponse("Your Login account is disabled.")
@@ -121,6 +130,18 @@ def user_login(request):
             return HttpResponse("Invalid login details supplied.")
     else:
         return render(request, 'main/login.html')
+
+@login_required
+def profile(request):
+    tmpObj = json.loads(serializers.serialize("json",UserProfile.objects.filter(user=request.user)))
+    apikey = tmpObj[0]['fields']['apikey']
+    return  HttpResponse(f"Logged in.\n\nEmail: {request.user.email}\nUsername: {request.user.username}\nAPI Key: {apikey}")
+    
+@login_required
+def user_logout(request):
+    logout(request)
+    return redirect(reverse('rango:index'))
+
 
 def ruofan(request):
     return HttpResponse("Ruofan's page...")
