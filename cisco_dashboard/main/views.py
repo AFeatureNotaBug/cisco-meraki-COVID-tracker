@@ -11,11 +11,12 @@ from random import randint as r
 import io, urllib, base64
 
 from django.shortcuts import render, redirect
-from main.forms import UserForm
+from main.forms import UserForm, UserProfileForm
 
 import meraki
 from main.models import Organisation
 from main.models import Network
+from main.models import *
 
 # Create your views here.
 def index(request):
@@ -98,7 +99,7 @@ def register(request):
         profile_form = UserProfileForm()
 
     return render(request,
-                 'register.html',
+                 'main/register.html',
                  context = {'user_form': user_form,
                             'profile_form': profile_form,
                             'registered': registered})
@@ -111,14 +112,15 @@ def user_login(request):
         if user:
             if user.is_active:
                 login(request, user)
-                return redirect(reverse('main:index'))
+                return HttpResponse("Successfully logged in\napikey: " +'example' )
+                #return redirect(reverse('index'))
             else:
                 return HttpResponse("Your Login account is disabled.")
         else:
             print(f"Invalid login details: {username}, {password}")
             return HttpResponse("Invalid login details supplied.")
     else:
-        return render(request, 'login.html')
+        return render(request, 'main/login.html')
 
 def ruofan(request):
     return HttpResponse("Ruofan's page...")
