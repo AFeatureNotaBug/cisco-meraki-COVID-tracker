@@ -98,7 +98,7 @@ def register(request):
         profile_form = UserProfileForm()
 
     return render(request,
-                 'main/register.html',
+                 'register.html',
                  context = {'user_form': user_form,
                             'profile_form': profile_form,
                             'registered': registered})
@@ -118,7 +118,7 @@ def user_login(request):
             print(f"Invalid login details: {username}, {password}")
             return HttpResponse("Invalid login details supplied.")
     else:
-        return render(request, 'main/login.html')
+        return render(request, 'login.html')
 
 def ruofan(request):
     return HttpResponse("Ruofan's page...")

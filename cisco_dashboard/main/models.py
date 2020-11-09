@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from main.forms import UserForm, UserProfile
 
 
 from django.template.defaultfilters import slugify
@@ -37,3 +38,9 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+class UserForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput())
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password',)
