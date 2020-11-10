@@ -6,12 +6,17 @@
 {% endblock %}
 
 {% block sidebar_block %}
-<h3 class='title'>Organisations</h3>
+<h3 class='title'>Overview</h3>
 	<ul class="list-group list-group-flush">
-		{% for org in orgs%}
-			<a href="{% url 'show_org' org.slug %}" class="list-group-item list-group-item-action">
-				{{ org.orgName }} ({{ org.orgID }})
-			</a>
+		{% for org in allOrgs %}
+			<h4 class="text-muted">{{ org.orgName }}</h4>
+			
+			{% for network in org.network_set.all %}
+				<a class="list-group-item list-group-item-action" id="{{ network.netID }}">
+					{{ network.netName }}
+				</a>
+			{% endfor %}
+			
 		{% endfor %}
 	</ul>
 {% endblock %}
@@ -21,21 +26,21 @@
 <div class='container'>
     <div class='row'>
         
-        <div><canvas id="myChart" width="400" height="400"></canvas></div>
+        <div><canvas id="chartSpace" width="400" height="400"></canvas></div>
     
     </div>
 </div>
 <script>
-    window.addEventListener('load', function(){
+    window.addEventListener('click', function(){
         console.log("running")
-        var ctx = document.getElementById('myChart').getContext('2d');
+        var ctx = document.getElementById('chartSpace').getContext('2d');
         var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
             datasets: [{
                 label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
+                data: [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
