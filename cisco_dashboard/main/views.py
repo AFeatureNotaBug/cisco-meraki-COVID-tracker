@@ -109,7 +109,7 @@ def profile(request):
         apikey = tmpObj[0]['fields']['apikey']
     except:
         apikey = 'Not found'
-    return  HttpResponse(f"Logged in.\n\nEmail: {request.user.email}\nUsername: {request.user.username}\nAPI Key: {apikey}")
+    return render(request, 'main/profile.html', context={'email':request.user.email,'username':request.user.username,'apikey':apikey})
     
 @login_required
 def user_logout(request):
