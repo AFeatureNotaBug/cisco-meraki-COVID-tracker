@@ -1,19 +1,37 @@
 stages:
-  - test
+  - tests
 
-test:
-  stage: test
-  image: python:3.7
-  tags:
-    - docker
-  script:
-    - cd cisco_dashboard
-    # Create environment for python
-    - pip3 install virtualenv
-    - virtualenv -p python3 venv
-    - source venv/bin/activate
-    - pip3 install -r requirements.txt
-    # Set up and run tests
-    - python3 manage.py makemigrations 
-    - python3 manage.py migrate
-    - python3 manage.py test
+
+test:code_quality:
+    stage: tests
+    image: python:3.7
+    tags:
+        - docker
+        
+    script:
+        - cd cisco_dashboard/main
+        
+        - pip3 install pylint
+        - pylint models.py -r y
+    
+
+test:unit_tests:
+    stage: tests
+    image: python:3.7
+    tags:
+        - docker
+    
+    script:
+        - cd cisco_dashboard
+    
+        # Create environment for python
+        - pip3 install virtualenv
+        - virtualenv -p python3 venv
+        - source venv/bin/activate
+        - pip3 install -r requirements.txt
+        
+        # Set up and run tests
+        - python3 manage.py makemigrations 
+        - python3 manage.py migrate
+        - python3 manage.py test
+
