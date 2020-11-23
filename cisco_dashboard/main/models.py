@@ -1,22 +1,19 @@
-from django.db import models
-from django.contrib.auth.models import User
-from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-
-from django.template.defaultfilters import slugify
-
-
-"""
- * Django database models file
+"""Django database models file
  *  - Organisation Model   - Stores details of organisations retrieved from API
  *  - Network Model        - Stores details of networks under organisations
  *  - UserProfile Model    - Stores user account details
  *  - Device Model         - Stores details of devices retrieved using Networks
 """
+
+from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.template.defaultfilters import slugify
+
+
 class Organisation(models.Model):
-    """
-     * Stores details of organisations retrieved from API calls
+    """Stores details of organisations retrieved from API calls
      *  - orgID     - The organisations unique ID
      *  - orgName   - Name given to the organisation
      *  - orgURL    - URL of the organisations Cisco dashboard
@@ -34,8 +31,7 @@ class Organisation(models.Model):
 
 
 class Network(models.Model):
-    """
-     * Stores details of networks retrieved from API calls using Organisations
+    """Stores details of networks retrieved from API calls using Organisations
      *  - org       - Organisation that this Network belongs to
      *  - netID     - Network's unique ID
      *  - netName   - Name given to this network
@@ -53,8 +49,7 @@ class Network(models.Model):
 
 
 class UserProfile(models.Model):
-    """
-     * Stores user details
+    """Stores user details
      *  - user      - Links UserProfile to User model instance
      *  - apikey    - User's Cisco Meraki API key
     """
@@ -68,8 +63,7 @@ class UserProfile(models.Model):
 
 
 class Device(models.Model):
-    """
-     * Stores details of devices on a Network
+    """Stores details of devices on a Network
      *  - net   - The Network that this Device belongs to
      *  - devAddr - Device's address
      *  - devSerial - Device's serial number
