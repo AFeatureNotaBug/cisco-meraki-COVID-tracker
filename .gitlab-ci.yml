@@ -11,7 +11,9 @@ test:code_quality:
     script:
         - cd cisco_dashboard/main
         
+        - pip3 install django
         - pip3 install pylint
+        
         - pylint models.py -r y
     
 
