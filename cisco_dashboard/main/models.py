@@ -5,6 +5,10 @@
  *  - Device Model         - Stores details of devices retrieved using Networks
 """
 
+# The below line disables an error caused due to Django formatting
+# pylint: disable=E:101
+
+
 from django.db import models
 from django.contrib.auth.models import User
 #from django.db.models.signals import post_save
@@ -27,7 +31,7 @@ class Organisation(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.orgID)
-        super(Organisation, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class Network(models.Model):
@@ -45,7 +49,7 @@ class Network(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.netID)
-        super(Network, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class UserProfile(models.Model):
@@ -90,4 +94,4 @@ class Device(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.devMac)
-        super(Device, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
