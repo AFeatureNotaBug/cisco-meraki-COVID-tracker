@@ -37,11 +37,4 @@ class YourTestClass(TestCase):
     def test_one_plus_one_equals_two(self):
         print("Method: test_one_plus_one_equals_two.")
         self.assertEqual(1 + 1, 2)
-    def test_mainpage(self):
-        print('test mainpage status code')
-        response=self.client.get('/')
-        self.assertEqual(response.status_code, 200)
-    def test_page(self):
-        print('test mysub status code')
-        response=self.client.get('/ruofan')
-        self.assertEqual(response.status_code, 200)
+
