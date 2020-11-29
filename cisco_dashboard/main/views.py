@@ -42,9 +42,15 @@ def index(request):
     
 
 def overview(request):
-    updateAll('6bec40cf957de430a6f1f2baa056b99a4fac9ea0')
+    apikey =json.loads(serializers.serialize("json",UserProfile.objects.filter(user=request.user)))[0]['fields']['apikey']
+    print(apikey)
+    if(apikey == None):
+        print('NO APIKEY (use default)')
+        apikey = '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'
+    updateOrgs(apikey)
+    updateNetworks(apikey)
     context_dict = {
-        'allOrgs':  Organisation.objects.all(),
+        'allOrgs':  Organisation.objects.filter(apikey = apikey),
     }
     
     for org in Organisation.objects.all():
@@ -108,24 +114,35 @@ def profile(request):
     tmpObj = json.loads(serializers.serialize("json",UserProfile.objects.filter(user=request.user)))
     try:
         apikey = tmpObj[0]['fields']['apikey']
+        retapikey = (len(apikey)-4)*'*' + apikey[-4:]
     except:
         apikey = 'Not found'
-    return render(request, 'main/profile.html', context={'email':request.user.email,'username':request.user.username,'apikey':apikey})
+    return render(request, 'main/profile.html', context={'email':request.user.email,'username':request.user.username,'apikey':retapikey})
     
 @login_required
 def user_logout(request):
     logout(request)
     return redirect(reverse('index'))
 
+def updateOrgs(apikey):
+    dash = meraki.DashboardAPI(apikey)
+    updateOrganizations(dash,apikey)
+
+def updateNetworks(apikey):
+    dash = meraki.DashboardAPI(apikey)
+    updateOrganizations(dash,apikey)
+    for org in dash.organizations.getOrganizations():
+        updateNetwork(dash,org['id'])
+
 def updateAll(apikey):
     dash = meraki.DashboardAPI(apikey)
-    updateOrganizations(dash)
+    updateOrganizations(dash,apikey)
     for org in dash.organizations.getOrganizations():
         updateNetwork(dash,org['id'])
         #for net in dash.organizations.getOrganizationNetworks(org['id']):
         #    updateDevices(dash,net['id'])
 
-def updateOrganizations(dash):
+def updateOrganizations(dash,apikey):
     GETorgs = dash.organizations.getOrganizations() #Get all organizations
 
     for org in GETorgs:
@@ -137,6 +154,7 @@ def updateOrganizations(dash):
                 orgID   = org['id'],
                 orgName = org['name'],
                 orgURL  = org['url'],
+                apikey = apikey
                 #orgAPIOverview = APIOverview
             )
         except:
@@ -144,6 +162,7 @@ def updateOrganizations(dash):
                 orgID   = org['id'],
                 orgName = org['name'],
                 orgURL  = org['url'],
+                apikey = apikey
                 #orgAPIOverview = APIOverview
             )
             newOrg.save()

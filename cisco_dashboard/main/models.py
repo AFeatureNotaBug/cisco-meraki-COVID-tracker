@@ -12,6 +12,7 @@ class Organisation(models.Model):
     orgID   = models.CharField(max_length = 200)
     orgName = models.CharField(max_length = 200)
     orgURL  = models.CharField(max_length = 200)
+    apikey = models.CharField(max_length=200)
     #orgAPIOverview = models.JSONField(default=list)
     
     slug    = models.SlugField(unique = True, default = "")
