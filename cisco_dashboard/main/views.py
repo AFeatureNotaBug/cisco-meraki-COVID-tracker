@@ -95,10 +95,10 @@ def user_login(request):
                 return redirect('/profile')
                 #return redirect(reverse('index'))
             else:
-                return HttpResponse("Your Login account is disabled.")
+                return render(request,'main/error.html',context={'error':{'title':'Account disabled','message':'You login account has been disabled, it is no longer active.'}})
         else:
             print(f"Invalid login details: {username}, {password}")
-            return HttpResponse("Invalid login details supplied.")
+            return render(request,'main/error.html',context={"error":{'title':'Invalid login credentials','message':f"The username or password you provided us was invalid. Please try again.","bold":f"Username: {username}"}})
     else:
         return render(request, 'main/login.html')
 
