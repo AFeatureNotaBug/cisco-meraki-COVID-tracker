@@ -42,8 +42,15 @@ def index(request):
     
 
 def overview(request):
+    apikey =json.loads(serializers.serialize("json",UserProfile.objects.filter(user=request.user)))[0]['fields']['apikey']
+    print(apikey)
+    if(apikey == None):
+        print('NO APIKEY (use default)')
+        apikey = '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'
+    updateOrgs(apikey)
+    updateNetworks(apikey)
     context_dict = {
-        'allOrgs':  Organisation.objects.all(),
+        'allOrgs':  Organisation.objects.filter(apikey = apikey),
     }
     
     for org in Organisation.objects.all():
@@ -107,15 +114,116 @@ def profile(request):
     tmpObj = json.loads(serializers.serialize("json",UserProfile.objects.filter(user=request.user)))
     try:
         apikey = tmpObj[0]['fields']['apikey']
+        retapikey = (len(apikey)-4)*'*' + apikey[-4:]
     except:
         apikey = 'Not found'
-    return  HttpResponse(f"Logged in.\n\nEmail: {request.user.email}\nUsername: {request.user.username}\nAPI Key: {apikey}")
+    return render(request, 'main/profile.html', context={'email':request.user.email,'username':request.user.username,'apikey':retapikey})
     
 @login_required
 def user_logout(request):
     logout(request)
     return redirect(reverse('index'))
 
+def updateOrgs(apikey):
+    dash = meraki.DashboardAPI(apikey)
+    updateOrganizations(dash,apikey)
 
-#def ruofan(request):
-#    return HttpResponse("Ruofan's page...")
+def updateNetworks(apikey):
+    dash = meraki.DashboardAPI(apikey)
+    updateOrganizations(dash,apikey)
+    for org in dash.organizations.getOrganizations():
+        updateNetwork(dash,org['id'])
+
+def updateAll(apikey):
+    dash = meraki.DashboardAPI(apikey)
+    updateOrganizations(dash,apikey)
+    for org in dash.organizations.getOrganizations():
+        updateNetwork(dash,org['id'])
+        #for net in dash.organizations.getOrganizationNetworks(org['id']):
+        #    updateDevices(dash,net['id'])
+
+def updateOrganizations(dash,apikey):
+    GETorgs = dash.organizations.getOrganizations() #Get all organizations
+
+    for org in GETorgs:
+
+        try:
+            Organisation.objects.get(orgID=org['id'])
+            org_to_update = Organisation.objects.filter(orgID=org['id'])
+            org_to_update.update(
+                orgID   = org['id'],
+                orgName = org['name'],
+                orgURL  = org['url'],
+                apikey = apikey
+                #orgAPIOverview = APIOverview
+            )
+        except:
+            newOrg = Organisation.objects.create(
+                orgID   = org['id'],
+                orgName = org['name'],
+                orgURL  = org['url'],
+                apikey = apikey
+                #orgAPIOverview = APIOverview
+            )
+            newOrg.save()
+    
+
+
+#updates all networks for an organization ID
+def updateNetwork(dash,orgID):
+    GETnets = dash.organizations.getOrganizationNetworks(orgID)
+    newOrg = Organisation.objects.get(orgID=orgID)
+    for net in GETnets:
+        try:
+            Network.objects.get(netID = net['id'])
+            net_to_update = Network.objects.filter(netID = net['id'])
+            net_to_update.update(
+                    org     = newOrg,
+                    netID   = net['id'],
+                    netName = net['name']
+            )
+        except:
+            newNet = Network.objects.create(
+                    org     = newOrg,
+                    netID   = net['id'],
+                    netName = net['name']
+            )
+            newNet.save()
+
+#updates all devices for a network ID
+def updateDevices(dash,netID):
+    GETdevs = dash.networks.getNetworkDevices(netID)
+    newNet= Network.objects.get(netID=netID)
+            
+    for device in GETdevs:
+        try:
+            Device.objects.get(devSerial = device['serial'])
+            dev_to_update = Device.objects.filter(devSerial = device['serial'])
+            dev_to_update.update(
+                net = newNet, 
+                        
+                devAddr   = device['address'],
+                        
+                devSerial = device['serial'],
+                devMac    = device['mac'],
+                devModel  = device['model'],
+                        #devLanIP  = device['lanIp'],
+                        
+                devLat    = device['lat'],
+                devLong   = device['lng']
+                )
+        except:
+            newDevice = Device.objects.create(
+                net = newNet,
+
+                devAddr   = device['address'],
+                        
+                devSerial = device['serial'],
+                devMac    = device['mac'],
+                devModel  = device['model'],
+                        #devLanIP  = device['lanIp'],
+                        
+                devLat    = device['lat'],
+                devLong   = device['lng']
+                )
+            newDevice.save()

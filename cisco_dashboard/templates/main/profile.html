@@ -1,0 +1,25 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block page_title %}
+	<h3>Profile</h3>
+{% endblock %}
+
+{% block body_block %}
+Email: {{ email }}
+<br>
+Username: {{ username }}
+<br>
+API Key: {{ apikey }}
+{% endblock %}
+
+{% block sidebar_block %}
+<h3 class=title>
+	Pages
+</h3>
+<ul class="list-group list-group-flush">
+    <a href='/overview'>
+        <li class="list-group-item">Overview</li>
+    </a>
+</ul>
+{% endblock %}

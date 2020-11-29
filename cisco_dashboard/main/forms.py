@@ -10,6 +10,8 @@ class UserForm(forms.ModelForm):
         fields = ('username', 'email', 'password',)
 
 class UserProfileForm(forms.ModelForm):
-	class Meta:
-		model = UserProfile
-		fields = ('apikey',)
+
+    #apikey = forms.CharField(blank=True)
+    class Meta:
+        model = UserProfile
+        fields = ('apikey',)
