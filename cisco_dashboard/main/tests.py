@@ -1,7 +1,21 @@
 from django.test import TestCase
+from django.contrib.auth.models import User
 #https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
-
 # Create your tests here.
+
+class LogInTest(TestCase):
+    def setUp(self):
+        self.credentials = {
+            'username': 'testuser',
+            'password': 'secret'}
+        User.objects.create_user(**self.credentials)
+    def test_login(self):
+        # send login data
+        response = self.client.post('/login/', self.credentials, follow=True)
+        # should be logged in now
+        print('hello login')
+#        self.assertTrue(response.context['username'].is_active)
+
 class YourTestClass(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -23,3 +37,4 @@ class YourTestClass(TestCase):
     def test_one_plus_one_equals_two(self):
         print("Method: test_one_plus_one_equals_two.")
         self.assertEqual(1 + 1, 2)
+
