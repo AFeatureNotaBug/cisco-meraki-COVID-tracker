@@ -16,7 +16,8 @@ test:code_quality:
         
         #The --disable=W0222 flag is required due to Django formatting
         - pylint --disable=W0222 models.py -r y
-        - pylint forms.py -r y
+        #The --disable=R0903 flag is rewquired due to Django formatting
+        - pylint --disable=R0903 forms.py -r y
     
 
 test:unit_tests:
