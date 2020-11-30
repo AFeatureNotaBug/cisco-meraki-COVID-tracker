@@ -7,8 +7,8 @@ class register(TestCase):
     def setUp(self):
         self.credentials = {
             'username': 'testuser',
-            'email address':'549956326@qq.com'
-            'apikey':'customerday1'
+            'email address':'549956326@qq.com',
+            'apikey':'customerday1',
             'password': 'secret'}
         User.objects.create_user(**self.credentials)
     def test_register(self):
