@@ -6,18 +6,20 @@
 
 from django import forms
 from django.contrib.auth.models import User
-from main.models import *
+from main.models import User
+from main.models import UserProfile
 
 
 class UserForm(forms.ModelForm):
     """UserForm form
-     *  - username  - User's username  
+     *  - username  - User's username
      *  - email     - User's email
      *  - password  - User's password
     """
     password = forms.CharField(widget=forms.PasswordInput())
 
     class Meta:
+        """Meta"""
         model = User
         fields = ('username', 'email', 'password',)
 
@@ -27,5 +29,6 @@ class UserProfileForm(forms.ModelForm):
      *  - apikey    - User's API key
     """
     class Meta:
+        """Meta"""
         model = UserProfile
         fields = ('apikey',)
