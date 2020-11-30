@@ -26,6 +26,6 @@ class UserProfileForm(forms.ModelForm):
     """UserProfileForm form
      *  - apikey    - User's API key
     """
-	class Meta:
-		model = UserProfile
-		fields = ('apikey',)
+    class Meta:
+        model = UserProfile
+        fields = ('apikey',)
