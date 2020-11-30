@@ -2,14 +2,15 @@
 {% load static %}
 
 {% block page_title %}
-	<h3>Home</h3>
+	<h3>Profile</h3>
 {% endblock %}
 
 {% block body_block %}
-<h1>Welcome to the CS11 Meraki Dashboard</h1>
-
-<h3>This page is still under development</h3>
-
+Email: {{ email }}
+<br>
+Username: {{ username }}
+<br>
+API Key: {{ apikey }}
 {% endblock %}
 
 {% block sidebar_block %}
