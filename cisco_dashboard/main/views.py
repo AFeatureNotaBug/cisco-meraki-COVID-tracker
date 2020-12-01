@@ -40,15 +40,16 @@ def index(request):
     response = render(request, 'main/index.html', context = {'example_text' : 'THIS IS EXAMPLE TEXT',})
     return response
     
-
+@login_required
 def overview(request):
     apikey =json.loads(serializers.serialize("json",UserProfile.objects.filter(user=request.user)))[0]['fields']['apikey']
     print(apikey)
-    if(apikey == None):
+    if(apikey == None or 'demo'):
         print('NO APIKEY (use default)')
         apikey = '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'
-    updateOrgs(apikey)
-    updateNetworks(apikey)
+    else:
+        updateOrgs(apikey)
+        updateNetworks(apikey)
     context_dict = {
         'allOrgs':  Organisation.objects.filter(apikey = apikey),
     }
@@ -57,6 +58,22 @@ def overview(request):
         context_dict[org.orgID] = Network.objects.filter(org = org)
     
     return render(request, 'main/overviewPage.html', context = context_dict)
+
+@login_required
+def usedemokey(request):
+    user_to_update = UserProfile.objects.filter(user=request.user)
+    user_to_update.update(
+    apikey = 'demo'
+    )
+    return redirect('/profile')
+
+@login_required
+def editapikey(request):
+    user_to_update = UserProfile.objects.filter(user=request.user)
+    user_to_update.update(
+    apikey = request.POST['apikey']
+    )
+    return redirect('/profile')
 
 
 # View for register page

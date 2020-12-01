@@ -9,7 +9,7 @@
 <h3 class='title'>Overview</h3>
 	<ul class="list-group list-group-flush">
 		{% for org in allOrgs %}
-			<h4 class="text-muted">{{ org.orgName }}</h4>
+			<h4 class="text-muted orgname" >{{ org.orgName }}</h4>
 			
 			{% for network in org.network_set.all %}
 				<a class="list-group-item list-group-item-action" id="{{ network.netID }}">
