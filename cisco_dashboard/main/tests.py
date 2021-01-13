@@ -41,11 +41,10 @@ class TestAPI(TestCase):
      *  Checks that creation was successful
     """
 
-    @classmethod
-    def set_up_test_data(cls):
+    def test_api_call_and_model(self):
         """
-         * This function retrieves the DevNet Sandbox
-         * organisation and stores it in the db
+         * This function retrieves the DevNet Sandbox organisation and stores it in the db
+         * The organisation will then be retrieved and checked
         """
         api_key = "6bec40cf957de430a6f1f2baa056b99a4fac9ea0"    # Test API keys
         dash = meraki.DashboardAPI(api_key) # Set up dash using API keys
@@ -61,16 +60,13 @@ class TestAPI(TestCase):
             )
             test_org.save()
 
-        except:
+        except meraki.exceptions.APIError:
             assert False
 
 
-    @classmethod
-    def test_retrieve(cls):
-        """This function checks that creation was successful"""
         try:
-            Organisation.objects.get(orgID = "549236")
-            #self.assertEqual(getOrg, testOrg)
+            get_org = Organisation.objects.get(orgID = "549236")
+            self.assertEqual(get_org, test_org)
 
-        except:
+        except Organisation.DoesNotExist:
             assert False
