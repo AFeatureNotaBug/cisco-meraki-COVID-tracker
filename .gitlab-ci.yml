@@ -15,9 +15,12 @@ test:code_quality:
         - pip3 install pylint
         
         #The --disable=W0222 flag is required due to Django formatting
-        - pylint --disable=W0222 models.py -r y
+        - pylint --disable=W0222 models.py -r y # Checks that models.py is correctly formatted
+        
         #The --disable=R0903 flag is rewquired due to Django formatting
-        - pylint --disable=R0903 forms.py -r y
+        - pylint --disable=R0903 forms.py -r y  # Checks that forms.py is correctly formatted
+        
+        - pylint tests.py -r y  #Checks that tests.py is correctly formatted
     
 
 test:unit_tests:
