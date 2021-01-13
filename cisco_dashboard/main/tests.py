@@ -1,55 +1,76 @@
+"""Django Unit Tests"""
+import meraki
 from django.test import TestCase
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from main.models import Organisation
 #https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
 
-# Create your tests here.
-class register(TestCase):
-    def setUp(self):
-        '''
-        self.credentials = {
-            'username': 'testuser1',
+
+class RegisterLoginTest(TestCase):
+    """Tests registration and login functionality"""
+    def test_register_and_login(self):
+        """
+         * Test registration functionality by registering a test account
+         * Also test login functionality by logging in to the registered user account
+        """
+        user_creds = {
+            'username':'aa',
             'email':'549956326@qq.com',
-            'password': 'secret',
-            'apikey':'customerday1'}
-        User.objects.create_user(**self.credentials)'''
-    def test_register(self):
-        # send register data
-        #response = self.client.post('/register/', self.credentials, follow=True)
-        response = self.client.post('/register/', {'username':'aa', 'email':'549956326@qq.com','password':'secret', 'apikey':'customerday1' }, follow=True)
-        # should be logged in now
-        print('hello register')
-#        self.assertTrue(response.context['username'].is_active)
+            'password':'secret',
+            'apikey':'customerday1'
+        }
 
-class LogInTest(TestCase):
-    def setUp(self):
-        self.credentials = {
-            'username': 'testuser',
-            'password': 'secret'}
-        User.objects.create_user(**self.credentials)
-    def test_login(self):
-        # send login data
-        response = self.client.post('/login/', self.credentials, follow=True)
-        # should be logged in now
-        print('hello login')
-#        self.assertTrue(response.context['username'].is_active)
-class YourTestClass(TestCase):
+        response = self.client.post(
+            '/register/',
+            user_creds,
+            follow = True
+        )
+
+        self.assertTrue(response.status_code == 200)    # Check registration was successful
+        assert User.objects.get(username = "aa")        # Ensure user exists
+
+        user = authenticate(username='aa', password='secret')         # Login with register details
+        self.assertTrue((user is not None) and user.is_authenticated) # Assert login was successful
+
+
+class TestAPI(TestCase):
+    """Simple API Test.
+     *  Retrieves DevNet Sandbox organisation using the test API key
+     *  Creates a db object for the organisation
+     *  Checks that creation was successful
+    """
+
     @classmethod
-    def setUpTestData(cls):
-        print("setUpTestData: Run once to set up non-modified data for all class methods.")
-        pass
+    def set_up_test_data(cls):
+        """
+         * This function retrieves the DevNet Sandbox
+         * organisation and stores it in the db
+        """
+        api_key = "6bec40cf957de430a6f1f2baa056b99a4fac9ea0"    # Test API keys
+        dash = meraki.DashboardAPI(api_key) # Set up dash using API keys
 
-    def setUp(self):
-        print("setUp: Run once for every test method to setup clean data.")
-        pass
+        try:
+            devnet = dash.organizations.getOrganization("549236")
 
-    def test_false_is_false(self):
-        print("Method: test_false_is_false.")
-        self.assertFalse(False)
+            test_org = Organisation.objects.create(
+                orgID   = devnet['id'],
+                orgName = devnet['name'],
+                orgURL  = devnet['url'],
+                apikey = api_key
+            )
+            test_org.save()
 
-    def test_false_is_true(self):
-        print("Method: test_false_is_true.")
-        self.assertTrue(True)
+        except:
+            assert False
 
-    def test_one_plus_one_equals_two(self):
-        print("Method: test_one_plus_one_equals_two.")
-        self.assertEqual(1 + 1, 2)
+
+    @classmethod
+    def test_retrieve(cls):
+        """This function checks that creation was successful"""
+        try:
+            Organisation.objects.get(orgID = "549236")
+            #self.assertEqual(getOrg, testOrg)
+
+        except:
+            assert False
