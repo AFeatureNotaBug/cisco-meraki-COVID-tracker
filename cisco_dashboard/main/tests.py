@@ -1,7 +1,37 @@
 from django.test import TestCase
+from django.contrib.auth.models import User
 #https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
 
 # Create your tests here.
+class register(TestCase):
+    def setUp(self):
+        '''
+        self.credentials = {
+            'username': 'testuser1',
+            'email':'549956326@qq.com',
+            'password': 'secret',
+            'apikey':'customerday1'}
+        User.objects.create_user(**self.credentials)'''
+    def test_register(self):
+        # send register data
+        #response = self.client.post('/register/', self.credentials, follow=True)
+        response = self.client.post('/register/', {'username':'aa', 'email':'549956326@qq.com','password':'secret', 'apikey':'customerday1' }, follow=True)
+        # should be logged in now
+        print('hello register')
+#        self.assertTrue(response.context['username'].is_active)
+
+class LogInTest(TestCase):
+    def setUp(self):
+        self.credentials = {
+            'username': 'testuser',
+            'password': 'secret'}
+        User.objects.create_user(**self.credentials)
+    def test_login(self):
+        # send login data
+        response = self.client.post('/login/', self.credentials, follow=True)
+        # should be logged in now
+        print('hello login')
+#        self.assertTrue(response.context['username'].is_active)
 class YourTestClass(TestCase):
     @classmethod
     def setUpTestData(cls):
