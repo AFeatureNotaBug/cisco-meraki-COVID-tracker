@@ -1,86 +1,108 @@
+"""
+ * Views file
+ * Contains all views used in the Cisco Dashboard web app
+"""
+
+import json
+import meraki
+
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.http import JsonResponse
-from django.template import RequestContext
-from django.contrib.auth import authenticate, login, logout
-from django.urls import reverse
 from django.shortcuts import redirect
+
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
+from django.urls import reverse
+
 from django.core import serializers
 
+from main.forms import UserForm
+from main.forms import UserProfileForm
 
-import matplotlib.pyplot as plt
-from random import randint as r
-import io, urllib, base64,json
-
-from django.shortcuts import render, redirect
-from main.forms import UserForm, UserProfileForm
-
-import meraki
 from main.models import Organisation
 from main.models import Network
-from main.models import *
-from django.core import serializers
-
-import matplotlib.pyplot as plt
-from random import randint as r
-import io, urllib, base64
-import json
-#from django.core.serializers.json import DjangoJSONEncoder
-
-
-import meraki
-from main.models import Organisation, Network, Device
+from main.models import Device
+from main.models import UserProfile
 
 
 def index(request):
-    #return HttpResponse("Hello, world. You're at the main index.")
+    """Index page view"""
 
-    response = render(request, 'main/index.html', context = {'example_text' : 'THIS IS EXAMPLE TEXT',})
+    context_dict = {
+        'example_text': 'THIS IS EXAMPLE TEXT',
+    }
+
+    response = render(
+        request,
+        'main/index.html',
+        context = context_dict
+    )
+
     return response
-    
+
+
 @login_required
 def overview(request):
-    apikey =json.loads(serializers.serialize("json",UserProfile.objects.filter(user=request.user)))[0]['fields']['apikey']
-    print(apikey)
-    if(apikey == None or 'demo'):
-        print('NO APIKEY (use default)')
+    """
+    Overview view
+     * Requires login
+     * Lists organisations and member networks
+    """
+
+    apikey = json.loads(serializers.serialize("json",
+    UserProfile.objects.filter(user = request.user)))[0]['fields']['apikey']
+
+    if(apikey is None or 'demo'):
         apikey = '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'
+
     else:
-        updateOrgs(apikey)
-        updateNetworks(apikey)
+        update_orgs(apikey)
+        update_all_networks(apikey)
+
     context_dict = {
         'allOrgs':  Organisation.objects.filter(apikey = apikey),
     }
-    
+
     for org in Organisation.objects.all():
-        context_dict[org.orgID] = Network.objects.filter(org = org)
-    
+        context_dict[org.org_id] = Network.objects.filter(org = org)
+
     return render(request, 'main/overviewPage.html', context = context_dict)
+
 
 @login_required
 def usedemokey(request):
+    """Updates use API key to demo key"""
+
     user_to_update = UserProfile.objects.filter(user=request.user)
+
     user_to_update.update(
-    apikey = 'demo'
+        apikey = 'demo'
     )
+
     return redirect('/profile')
+
 
 @login_required
 def editapikey(request):
+    """Allows user to edit their API key"""
+
     user_to_update = UserProfile.objects.filter(user=request.user)
+
     user_to_update.update(
-    apikey = request.POST['apikey']
+        apikey = request.POST['apikey']
     )
+
     return redirect('/profile')
 
 
-# View for register page
 def register(request):
-    """ if request.user:
-        return redirect('/profile') """
+    """
+    View for register page
+     * Allows users to register for an account
+    """
+
     registered = False
+
     if request.method == 'POST':
         user_form = UserForm(request.POST)
         profile_form = UserProfileForm(request.POST)
@@ -89,158 +111,259 @@ def register(request):
             user = user_form.save()
             user.set_password(user.password)
             user.save()
-            profile = profile_form.save(commit=False)
-            profile.user = user
-            profile.save()
+
+            profile_form = profile_form.save(commit = False)
+            profile_form.user = user
+            profile_form.save()
+
             registered = True
+
         else:
             print(user_form.errors, profile_form.errors)
+
     else:
         user_form = UserForm()
         profile_form = UserProfileForm()
 
-    return render(request,
-                 'main/register.html',
-                 context = {'user_form': user_form,
-                            'profile_form': profile_form,
-                            'registered': registered})
+    context_dict = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'registered': registered
+    }
+
+    return render(request, 'main/register.html', context = context_dict)
+
 
 def user_login(request):
-    """ if request.user:
-        return redirect('/profile') """
+    """
+    User login view
+     * Allows users with existing accounts to log in
+    """
+
+    render_url = "main/login.html"
+    context_dict = dict()
+    redirect_status = False
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(username=username, password=password)
+
+
         if user:
             if user.is_active:
                 login(request, user)
-                #return HttpResponse("Successfully logged in\napikey: " +'example' )
-                return redirect('/profile')
-                #return redirect(reverse('index'))
+                redirect_status = True
+
             else:
-                return render(request,'main/error.html',context={'error':{'title':'Account disabled','message':'You login account has been disabled, it is no longer active.'}})
+                context_dict = {
+                    'error': {
+                        'title': 'Account disabled',
+                        'message': 'You login account has been disabled, it is no longer active.'
+                    }
+                }
+
+                render_url = "main/error.html"
+
         else:
-            print(f"Invalid login details: {username}, {password}")
-            return render(request,'main/error.html',context={"error":{'title':'Invalid login credentials','message':f"The username or password you provided us was invalid. Please try again.","bold":f"Username: {username}"}})
-    else:
-        return render(request, 'main/login.html')
+            context_dict = {
+                "error": {
+                    'title': 'Invalid login credentials',
+                    'message': "The username or password you \
+                        provided us was invalid. Please try again.",
+
+                    "bold": f"Username: {username}"
+                }
+            }
+
+            render_url = "main/error.html"
+
+    if redirect_status:
+        return redirect('/profile')
+
+    return render(request, render_url, context = context_dict)
+
 
 @login_required
 def profile(request):
-    tmpObj = json.loads(serializers.serialize("json",UserProfile.objects.filter(user=request.user)))
+    """
+    Profile view
+     * Allows logged-in users to view their profile information
+    """
+
+    tmp_obj = json.loads(
+        serializers.serialize(
+            "json",
+            UserProfile.objects.filter(user = request.user)
+        )
+    )
+
     try:
-        apikey = tmpObj[0]['fields']['apikey']
-        retapikey = (len(apikey)-4)*'*' + apikey[-4:]
-    except:
+        apikey = tmp_obj[0]['fields']['apikey']
+        retapikey = (len(apikey) - 4) * '*' + apikey[-4:]
+
+    except IndexError:
         apikey = 'Not found'
-    return render(request, 'main/profile.html', context={'email':request.user.email,'username':request.user.username,'apikey':retapikey})
-    
+
+    context_dict = {
+        'email': request.user.email,
+        'username': request.user.username,
+        'apikey': retapikey
+    }
+
+    return render(request, 'main/profile.html', context = context_dict)
+
+
 @login_required
 def user_logout(request):
+    """
+    Logout view
+     * Allows logged-in users to log out
+     * Redirects users to index page
+    """
+
     logout(request)
+
     return redirect(reverse('index'))
 
-def updateOrgs(apikey):
-    dash = meraki.DashboardAPI(apikey)
-    updateOrganizations(dash,apikey)
 
-def updateNetworks(apikey):
-    dash = meraki.DashboardAPI(apikey)
-    updateOrganizations(dash,apikey)
-    for org in dash.organizations.getOrganizations():
-        updateNetwork(dash,org['id'])
+def update_orgs(apikey):
+    """
+    Calls function to update organisations
+    """
 
-def updateAll(apikey):
     dash = meraki.DashboardAPI(apikey)
-    updateOrganizations(dash,apikey)
+    update_organisations(dash, apikey)
+
+
+def update_all_networks(apikey):
+    """
+    Calls function to update networks
+    """
+
+    dash = meraki.DashboardAPI(apikey)
+    update_organisations(dash, apikey)
+
     for org in dash.organizations.getOrganizations():
-        updateNetwork(dash,org['id'])
+        update_network(dash,org['id'])
+
+
+def update_all(apikey):
+    """
+    Calls functions to update both organisations and networks
+    """
+
+    dash = meraki.DashboardAPI(apikey)
+    update_organisations(dash,apikey)
+
+    for org in dash.organizations.getOrganizations():
+        update_network(dash,org['id'])
         #for net in dash.organizations.getOrganizationNetworks(org['id']):
-        #    updateDevices(dash,net['id'])
+        #update_devices(dash,net['id'])
 
-def updateOrganizations(dash,apikey):
-    GETorgs = dash.organizations.getOrganizations() #Get all organizations
 
-    for org in GETorgs:
+def update_organisations(dash, apikey):
+    """
+    Updates organisations in database
+    """
+
+    get_orgs = dash.organizations.getOrganizations() #Get all organizations
+
+    for org in get_orgs:
 
         try:
-            Organisation.objects.get(orgID=org['id'])
-            org_to_update = Organisation.objects.filter(orgID=org['id'])
+            Organisation.objects.get(org_id=org['id'])
+            org_to_update = Organisation.objects.filter(org_id=org['id'])
+
             org_to_update.update(
-                orgID   = org['id'],
+                org_id   = org['id'],
                 orgName = org['name'],
                 orgURL  = org['url'],
                 apikey = apikey
                 #orgAPIOverview = APIOverview
             )
-        except:
-            newOrg = Organisation.objects.create(
-                orgID   = org['id'],
+
+        except Organisation.DoesNotExist:
+            new_org = Organisation.objects.create(
+                org_id   = org['id'],
                 orgName = org['name'],
                 orgURL  = org['url'],
                 apikey = apikey
                 #orgAPIOverview = APIOverview
             )
-            newOrg.save()
-    
+            new_org.save()
+
 
 
 #updates all networks for an organization ID
-def updateNetwork(dash,orgID):
-    GETnets = dash.organizations.getOrganizationNetworks(orgID)
-    newOrg = Organisation.objects.get(orgID=orgID)
-    for net in GETnets:
+def update_network(dash,org_id):
+    """
+    Updates networks in database
+    """
+
+    get_nets = dash.organizations.getOrganizationNetworks(org_id)
+    new_org = Organisation.objects.get(org_id=org_id)
+
+    for net in get_nets:
         try:
-            Network.objects.get(netID = net['id'])
-            net_to_update = Network.objects.filter(netID = net['id'])
+            Network.objects.get(net_id = net['id'])
+            net_to_update = Network.objects.filter(net_id = net['id'])
+
             net_to_update.update(
-                    org     = newOrg,
-                    netID   = net['id'],
-                    netName = net['name']
+                org     = new_org,
+                net_id   = net['id'],
+                netName = net['name']
             )
-        except:
-            newNet = Network.objects.create(
-                    org     = newOrg,
-                    netID   = net['id'],
-                    netName = net['name']
+
+        except Network.DoesNotExist:
+            new_net = Network.objects.create(
+                org     = new_org,
+                net_id   = net['id'],
+                netName = net['name']
             )
-            newNet.save()
+
+            new_net.save()
+
 
 #updates all devices for a network ID
-def updateDevices(dash,netID):
-    GETdevs = dash.networks.getNetworkDevices(netID)
-    newNet= Network.objects.get(netID=netID)
-            
-    for device in GETdevs:
+def update_devices(dash,net_id):
+    """
+    Updates devices in database
+    """
+
+    get_devices = dash.networks.getNetworkDevices(net_id)
+    new_net= Network.objects.get(net_id=net_id)
+
+    for device in get_devices:
         try:
             Device.objects.get(devSerial = device['serial'])
+
             dev_to_update = Device.objects.filter(devSerial = device['serial'])
             dev_to_update.update(
-                net = newNet, 
-                        
-                devAddr   = device['address'],
-                        
-                devSerial = device['serial'],
-                devMac    = device['mac'],
-                devModel  = device['model'],
-                        #devLanIP  = device['lanIp'],
-                        
-                devLat    = device['lat'],
-                devLong   = device['lng']
-                )
-        except:
-            newDevice = Device.objects.create(
-                net = newNet,
+                net = new_net,
 
                 devAddr   = device['address'],
-                        
                 devSerial = device['serial'],
                 devMac    = device['mac'],
                 devModel  = device['model'],
-                        #devLanIP  = device['lanIp'],
-                        
+                #devLanIP  = device['lanIp'],
+
                 devLat    = device['lat'],
                 devLong   = device['lng']
-                )
-            newDevice.save()
+            )
+
+        except Device.DoesNotExist:
+            new_device = Device.objects.create(
+                net = new_net,
+
+                devAddr   = device['address'],
+
+                devSerial = device['serial'],
+                devMac    = device['mac'],
+                devModel  = device['model'],
+                #devLanIP  = device['lanIp'],
+
+                devLat    = device['lat'],
+                devLong   = device['lng']
+            )
+            new_device.save()

@@ -23,6 +23,9 @@ test:code_quality:
         
         #The --disable=E1101 flag is required due to Django formatting -  E1101: Class 'Organisation' has no 'objects' member (no-member)
         - pylint --disable=E1101 tests.py -r y  # Checks that tests.py is correctly formatted
+        
+        #The --disable=E1101 flag is again required due to Django formatting
+        - pylint --disable=E1101 views.py -R y  # Checks that views.py is correctly formatted
     
 
 test:unit_tests:
