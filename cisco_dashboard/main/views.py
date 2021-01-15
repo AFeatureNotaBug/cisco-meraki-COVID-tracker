@@ -13,6 +13,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 from django.urls import reverse
+import folium, requests
+
 
 from django.core import serializers
 
@@ -43,16 +45,10 @@ def index(request):
 
 @login_required
 def overview(request):
-    """
-    Overview view
-     * Requires login
-     * Lists organisations and member networks
-    """
-
-    apikey = json.loads(serializers.serialize("json",
-    UserProfile.objects.filter(user = request.user)))[0]['fields']['apikey']
-
-    if(apikey is None or 'demo'):
+    apikey =json.loads(serializers.serialize("json",UserProfile.objects.filter(user=request.user)))[0]['fields']['apikey']
+    print(apikey)
+    if(apikey == None or  apikey== 'demo' or apikey == '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'):
+        print('NO APIKEY (use default)')
         apikey = '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'
 
     else:
@@ -62,10 +58,10 @@ def overview(request):
     context_dict = {
         'allOrgs':  Organisation.objects.filter(apikey = apikey),
     }
-
-    for org in Organisation.objects.all():
-        context_dict[org.org_id] = Network.objects.filter(org = org)
-
+    
+    for org in Organisation.objects.filter(apikey=apikey):
+        context_dict[org.orgID] = Network.objects.filter(org = org)
+    
     return render(request, 'main/overviewPage.html', context = context_dict)
 
 
@@ -365,5 +361,26 @@ def update_devices(dash,net_id):
 
                 devLat    = device['lat'],
                 devLong   = device['lng']
-            )
-            new_device.save()
+                )
+            newDevice.save()
+
+def show_map(request):  
+    #creation of map comes here + business logic
+    m = folium.Map([55.875, -4.28], zoom_start=20, max_zoom=20)
+
+    d = requests.post("https://us-central1-cisco-301811.cloudfunctions.net/scanning-listener",{"key":"randominsert!!222_"},{"Content-Type":"application/json"})
+    print(d.json())
+    respJson = d.json()
+    print(respJson['body'])
+    for x in respJson['body']['data']['observations']:
+        print(x['location']['lat'],x['location']['lng'])
+        test = folium.Html(x['clientMac'], script=True)
+        popup = folium.Popup(test, max_width=2650)
+        folium.CircleMarker(location=[x['location']['lat'],x['location']['lng']], radius=2, popup=popup).add_to(m)
+
+    m.fit_bounds([55.7512981329184,-4.285030533520967],[55.87513892244049,-4.284932293711506])
+    m=m._repr_html_() #updated
+    
+    context = {'my_map': m}
+
+    return render(request, 'main/show_folium_map.html', context)
