@@ -41,7 +41,9 @@ def index(request):
 
     return response
 
-
+"""
+Main content
+"""
 @login_required
 def overview(request):
     uob = UserProfile.objects.filter(user=request.user)
