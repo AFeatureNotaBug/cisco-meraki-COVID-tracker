@@ -41,11 +41,9 @@ def index(request):
 
     return response
 
-"""
-Main content
-"""
 @login_required
 def overview(request):
+    """Main content"""
     uob = UserProfile.objects.filter(user=request.user)
     apikey =json.loads(serializers.serialize("json",uob))[0]['fields']['apikey']
     print(apikey)
@@ -381,13 +379,13 @@ def edit_scanning_api_url(request):
 
     return redirect('/overview')
 
-def get_coords(scanningAPIURL):
-    if(scanningAPIURL == "" or scanningAPIURL == None):
+def get_coords(scanning_api_url):
+    if(scanning_api_url == "" or scanning_api_url == None):
         return ["Please set your scanning API URL in your profile"]
     #creation of map comes here + business logic
-    
     try:
-        d = requests.post(scanningAPIURL,{"key":"randominsert!!222_"},{"Content-Type":"application/json"})
+        body = {"key":"randominsert!!222_"}
+        d = requests.post(scanning_api_url,body,{"Content-Type":"application/json"})
         respJson = d.json()
         return respJson['body']['data']['observations']
     except:
