@@ -296,7 +296,7 @@ def update_organisations(dash, apikey):
 
 
 #updates all networks for an organization ID
-def update_network(dash,orgID):
+def update_network(dash,org_id):
     """
     Updates networks in database
     """
@@ -326,7 +326,7 @@ def update_network(dash,orgID):
 
 
 #updates all devices for a network ID
-def update_devices(dash,netID):
+def update_devices(dash,net_id):
     """
     Updates devices in database
     """
@@ -353,7 +353,7 @@ def update_devices(dash,netID):
             )
 
         except Device.DoesNotExist:
-            newDevice = Device.objects.create(
+            new_device = Device.objects.create(
                 net = new_net,
 
                 devAddr   = device['address'],
@@ -366,10 +366,10 @@ def update_devices(dash,netID):
                 devLat    = device['lat'],
                 devLong   = device['lng']
                 )
-            newDevice.save()
+            new_device.save()
 
 
-def editScanningAPIURL(request):
+def edit_scanning_api_url(request):
     """Allows user to edit their API key"""
 
     network_to_update = Network.objects.filter(netID=request.POST['netID'])

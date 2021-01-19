@@ -32,7 +32,7 @@
 {% for network in org.network_set.all %}
 <a class="main-block-item" id="{{ network.netID }}-body">
     {{ network.netName }}
-    <form action='editScanningAPIURL' method='POST'>
+    <form action='edit_scanning_api_url' method='POST'>
         {% csrf_token %}
         <label>Scanning API URL: </label>
         <input type="text" id="scanningAPIURL" name="scanningAPIURL" placeholder="demo"

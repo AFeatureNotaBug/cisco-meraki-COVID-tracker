@@ -12,7 +12,7 @@ urlpatterns = [
     path('profile',views.profile,name='profile'),
     path('usedemokey',views.usedemokey),
     path('editapikey',views.editapikey),
-    path('editScanningAPIURL',views.editScanningAPIURL),
+    path('edit_scanning_api_url',views.editScanningAPIURL),
     path('accounts/login/',views.user_login,name='login'),
     
 ]
