@@ -13,7 +13,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 from django.urls import reverse
-import requests
 
 
 from django.core import serializers
@@ -277,18 +276,18 @@ def update_organisations(dash, apikey):
             org_to_update = Organisation.objects.filter(orgID=org['id'])
 
             org_to_update.update(
-                orgID   = org['id'],
-                orgName = org['name'],
-                orgURL  = org['url'],
+                org_id   = org['id'],
+                org_name = org['name'],
+                org_url  = org['url'],
                 apikey = apikey
                 #orgAPIOverview = APIOverview
             )
 
         except Organisation.DoesNotExist:
             new_org = Organisation.objects.create(
-                orgID   = org['id'],
-                orgName = org['name'],
-                orgURL  = org['url'],
+                org_id   = org['id'],
+                org_name = org['name'],
+                org_url  = org['url'],
                 apikey = apikey
                 #orgAPIOverview = APIOverview
             )
@@ -312,15 +311,15 @@ def update_network(dash,orgID):
 
             net_to_update.update(
                 org     = new_org,
-                netID   = net['id'],
-                netName = net['name']
+                net_id   = net['id'],
+                net_name = net['name']
             )
 
         except Network.DoesNotExist:
             new_net = Network.objects.create(
                 org     = new_org,
-                netID   = net['id'],
-                netName = net['name']
+                net_id   = net['id'],
+                net_name = net['name']
             )
 
             new_net.save()
