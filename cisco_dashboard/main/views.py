@@ -370,45 +370,6 @@ def update_devices(dash,netID):
                 )
             newDevice.save()
 
-def get_map(scanningAPIURL):  
-
-    #scanningAPIURL =json.loads(serializers.serialize("json",UserProfile.objects.filter(user=request.user)))[0]['fields']['scanningAPIURL']
-    if(scanningAPIURL == "" or scanningAPIURL == None):
-        return {'my_map':"Please set your scanning API URL in your profile"}
-    #creation of map comes here + business logic
-    
-    try:
-        d = requests.post(scanningAPIURL,{"key":"randominsert!!222_"},{"Content-Type":"application/json"})
-        print(d.json())
-        respJson = d.json()
-        print(respJson['body'])
-        m = folium.Map(zoom_start=18, max_zoom=18)
-        for x in respJson['body']['data']['observations']:
-            print(x['location']['lat'],x['location']['lng'])
-            test = folium.Html(x['clientMac'], script=True)
-            popup = folium.Popup(test, max_width=2650)
-            folium.CircleMarker(location=[x['location']['lat'],x['location']['lng']], radius=2, popup=popup).add_to(m)
-        
-        m.fit_bounds(m.get_bounds())
-        m=m._repr_html_() #updated
-        
-        return {'my_map': m}
-
-        
-    except:
-        return {'my_map':"Error retrieving info from scanning API"}
-
-def get_coords(scanningAPIURL):
-    if(scanningAPIURL == "" or scanningAPIURL == None):
-        return ["Please set your scanning API URL in your profile"]
-    #creation of map comes here + business logic
-    
-    try:
-        d = requests.post(scanningAPIURL,{"key":"randominsert!!222_"},{"Content-Type":"application/json"})
-        respJson = d.json()
-        return respJson['body']['data']['observations']
-    except:
-        return []
 
 def editScanningAPIURL(request):
     """Allows user to edit their API key"""
