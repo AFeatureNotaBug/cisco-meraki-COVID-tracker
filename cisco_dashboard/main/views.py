@@ -57,11 +57,15 @@ def overview(request):
 
     context_dict = {
         'allOrgs':  Organisation.objects.filter(apikey = apikey),
+        'coords':{}
     }
     
     for org in Organisation.objects.filter(apikey=apikey):
         context_dict[org.orgID] = Network.objects.filter(org = org)
+        for net in list(Network.objects.filter(org = org)):
+            context_dict['coords'][net.netID] = get_coords(net.scanningAPIURL)
     
+    context_dict['coords'] = json.dumps(context_dict['coords'])
     return render(request, 'main/overviewPage.html', context = context_dict)
 
 
@@ -197,6 +201,7 @@ def profile(request):
     try:
         apikey = tmp_obj[0]['fields']['apikey']
         retapikey = (len(apikey) - 4) * '*' + apikey[-4:]
+        #scanningAPIURL = tmp_obj[0]['fields']['scanningAPIURL']
 
     except IndexError:
         apikey = 'Not found'
@@ -204,7 +209,8 @@ def profile(request):
     context_dict = {
         'email': request.user.email,
         'username': request.user.username,
-        'apikey': retapikey
+        'apikey': retapikey,
+        #'scanningAPIURL':scanningAPIURL
     }
 
     return render(request, 'main/profile.html', context = context_dict)
@@ -268,11 +274,11 @@ def update_organisations(dash, apikey):
     for org in get_orgs:
 
         try:
-            Organisation.objects.get(org_id=org['id'])
-            org_to_update = Organisation.objects.filter(org_id=org['id'])
+            Organisation.objects.get(orgID=org['id'])
+            org_to_update = Organisation.objects.filter(orgID=org['id'])
 
             org_to_update.update(
-                org_id   = org['id'],
+                orgID   = org['id'],
                 orgName = org['name'],
                 orgURL  = org['url'],
                 apikey = apikey
@@ -281,7 +287,7 @@ def update_organisations(dash, apikey):
 
         except Organisation.DoesNotExist:
             new_org = Organisation.objects.create(
-                org_id   = org['id'],
+                orgID   = org['id'],
                 orgName = org['name'],
                 orgURL  = org['url'],
                 apikey = apikey
@@ -292,29 +298,29 @@ def update_organisations(dash, apikey):
 
 
 #updates all networks for an organization ID
-def update_network(dash,org_id):
+def update_network(dash,orgID):
     """
     Updates networks in database
     """
 
-    get_nets = dash.organizations.getOrganizationNetworks(org_id)
-    new_org = Organisation.objects.get(org_id=org_id)
+    get_nets = dash.organizations.getOrganizationNetworks(orgID)
+    new_org = Organisation.objects.get(orgID=orgID)
 
     for net in get_nets:
         try:
-            Network.objects.get(net_id = net['id'])
-            net_to_update = Network.objects.filter(net_id = net['id'])
+            Network.objects.get(netID = net['id'])
+            net_to_update = Network.objects.filter(netID = net['id'])
 
             net_to_update.update(
                 org     = new_org,
-                net_id   = net['id'],
+                netID   = net['id'],
                 netName = net['name']
             )
 
         except Network.DoesNotExist:
             new_net = Network.objects.create(
                 org     = new_org,
-                net_id   = net['id'],
+                netID   = net['id'],
                 netName = net['name']
             )
 
@@ -322,13 +328,13 @@ def update_network(dash,org_id):
 
 
 #updates all devices for a network ID
-def update_devices(dash,net_id):
+def update_devices(dash,netID):
     """
     Updates devices in database
     """
 
-    get_devices = dash.networks.getNetworkDevices(net_id)
-    new_net= Network.objects.get(net_id=net_id)
+    get_devices = dash.networks.getNetworkDevices(netID)
+    new_net= Network.objects.get(netID=netID)
 
     for device in get_devices:
         try:
@@ -349,7 +355,7 @@ def update_devices(dash,net_id):
             )
 
         except Device.DoesNotExist:
-            new_device = Device.objects.create(
+            newDevice = Device.objects.create(
                 net = new_net,
 
                 devAddr   = device['address'],
@@ -364,23 +370,52 @@ def update_devices(dash,net_id):
                 )
             newDevice.save()
 
-def show_map(request):  
+def get_map(scanningAPIURL):  
+
+    #scanningAPIURL =json.loads(serializers.serialize("json",UserProfile.objects.filter(user=request.user)))[0]['fields']['scanningAPIURL']
+    if(scanningAPIURL == "" or scanningAPIURL == None):
+        return {'my_map':"Please set your scanning API URL in your profile"}
     #creation of map comes here + business logic
-    m = folium.Map([55.875, -4.28], zoom_start=20, max_zoom=20)
-
-    d = requests.post("https://us-central1-cisco-301811.cloudfunctions.net/scanning-listener",{"key":"randominsert!!222_"},{"Content-Type":"application/json"})
-    print(d.json())
-    respJson = d.json()
-    print(respJson['body'])
-    for x in respJson['body']['data']['observations']:
-        print(x['location']['lat'],x['location']['lng'])
-        test = folium.Html(x['clientMac'], script=True)
-        popup = folium.Popup(test, max_width=2650)
-        folium.CircleMarker(location=[x['location']['lat'],x['location']['lng']], radius=2, popup=popup).add_to(m)
-
-    m.fit_bounds([55.7512981329184,-4.285030533520967],[55.87513892244049,-4.284932293711506])
-    m=m._repr_html_() #updated
     
-    context = {'my_map': m}
+    try:
+        d = requests.post(scanningAPIURL,{"key":"randominsert!!222_"},{"Content-Type":"application/json"})
+        print(d.json())
+        respJson = d.json()
+        print(respJson['body'])
+        m = folium.Map(zoom_start=18, max_zoom=18)
+        for x in respJson['body']['data']['observations']:
+            print(x['location']['lat'],x['location']['lng'])
+            test = folium.Html(x['clientMac'], script=True)
+            popup = folium.Popup(test, max_width=2650)
+            folium.CircleMarker(location=[x['location']['lat'],x['location']['lng']], radius=2, popup=popup).add_to(m)
+        
+        m.fit_bounds(m.get_bounds())
+        m=m._repr_html_() #updated
+        
+        return {'my_map': m}
 
-    return render(request, 'main/show_folium_map.html', context)
+        
+    except:
+        return {'my_map':"Error retrieving info from scanning API"}
+
+def get_coords(scanningAPIURL):
+    if(scanningAPIURL == "" or scanningAPIURL == None):
+        return ["Please set your scanning API URL in your profile"]
+    #creation of map comes here + business logic
+    
+    try:
+        d = requests.post(scanningAPIURL,{"key":"randominsert!!222_"},{"Content-Type":"application/json"})
+        respJson = d.json()
+        return respJson['body']['data']['observations']
+    except:
+        return []
+
+def editScanningAPIURL(request):
+    """Allows user to edit their API key"""
+
+    network_to_update = Network.objects.filter(netID=request.POST['netID'])
+    network_to_update.update(
+        scanningAPIURL = request.POST['scanningAPIURL']
+    )
+
+    return redirect('/overview')

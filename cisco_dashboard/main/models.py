@@ -40,6 +40,7 @@ class Network(models.Model):
      *  - org       - Organisation that this Network belongs to
      *  - netID     - Network's unique ID
      *  - netName   - Name given to this network
+     *  - scanningAPIURL    - get request URL for scanning api middle server
     """
     org     = models.ForeignKey(Organisation, on_delete = models.CASCADE)
 
@@ -47,6 +48,8 @@ class Network(models.Model):
     netName = models.CharField(max_length = 200)
 
     slug    = models.SlugField(unique = True, default = "")
+    
+    scanningAPIURL = models.CharField(max_length=128, unique=False,default=None)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.netID)

@@ -7,6 +7,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from main.models import UserProfile
+#from main.models import Network
 
 
 class UserForm(forms.ModelForm):
@@ -31,3 +32,8 @@ class UserProfileForm(forms.ModelForm):
         """Meta"""
         model = UserProfile
         fields = ('apikey',)
+
+""" class NetworkForm(forms.ModelForm):
+    class Meta:
+        model = Network
+        fields = ('scanningAPIURL',) """
