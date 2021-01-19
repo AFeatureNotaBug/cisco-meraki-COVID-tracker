@@ -31,7 +31,7 @@ class Organisation(models.Model):
     slug    = models.SlugField(unique = True, default = "")
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.orgID)
+        self.slug = slugify(self.org_id)
         super().save(*args, **kwargs)
 
 
