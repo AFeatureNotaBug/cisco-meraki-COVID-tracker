@@ -380,7 +380,7 @@ def edit_scanning_api_url(request):
     return redirect('/overview')
 
 def get_coords(scanning_api_url):
-    if(scanning_api_url == "" or scanning_api_url == None):
+    if scanning_api_url in ("",None):
         return ["Please set your scanning API URL in your profile"]
     #creation of map comes here + business logic
     try:
