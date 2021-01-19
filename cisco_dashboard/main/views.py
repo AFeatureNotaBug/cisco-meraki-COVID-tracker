@@ -13,7 +13,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 from django.urls import reverse
-import folium, requests
+import requests
 
 
 from django.core import serializers
