@@ -380,13 +380,15 @@ def edit_scanning_api_url(request):
     return redirect('/overview')
 
 def get_coords(scanning_api_url):
+    """ gets coordinates of scanning api url"""
     if scanning_api_url in ("",None):
         return ["Please set your scanning API URL in your profile"]
     #creation of map comes here + business logic
     try:
         body = {"key":"randominsert!!222_"}
-        d = requests.post(scanning_api_url,body,{"Content-Type":"application/json"})
-        respJson = d.json()
-        return respJson['body']['data']['observations']
-    except:
+        resp = requests.post(scanning_api_url,body,{"Content-Type":"application/json"})
+        resp_json = resp.json()
+        return resp_json['body']['data']['observations']
+    except Exception as e:
+        print(e)
         return []
