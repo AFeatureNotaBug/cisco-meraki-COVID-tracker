@@ -45,7 +45,8 @@ def index(request):
 
 @login_required
 def overview(request):
-    apikey =json.loads(serializers.serialize("json",UserProfile.objects.filter(user=request.user)))[0]['fields']['apikey']
+    uob = UserProfile.objects.filter(user=request.user)
+    apikey =json.loads(serializers.serialize("json",uob))[0]['fields']['apikey']
     print(apikey)
     if(apikey == None or  apikey== 'demo' or apikey == '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'):
         print('NO APIKEY (use default)')
@@ -58,13 +59,11 @@ def overview(request):
     context_dict = {
         'allOrgs':  Organisation.objects.filter(apikey = apikey),
         'coords':{}
-    }
-    
+        }    
     for org in Organisation.objects.filter(apikey=apikey):
         context_dict[org.orgID] = Network.objects.filter(org = org)
         for net in list(Network.objects.filter(org = org)):
             context_dict['coords'][net.netID] = get_coords(net.scanningAPIURL)
-    
     context_dict['coords'] = json.dumps(context_dict['coords'])
     return render(request, 'main/overviewPage.html', context = context_dict)
 
