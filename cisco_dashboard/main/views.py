@@ -301,13 +301,13 @@ def update_network(dash,org_id):
     Updates networks in database
     """
 
-    get_nets = dash.organizations.getOrganizationNetworks(orgID)
-    new_org = Organisation.objects.get(orgID=orgID)
+    get_nets = dash.organizations.getOrganizationNetworks(org_id)
+    new_org = Organisation.objects.get(org_id=org_id)
 
     for net in get_nets:
         try:
-            Network.objects.get(netID = net['id'])
-            net_to_update = Network.objects.filter(netID = net['id'])
+            Network.objects.get(net_id = net['id'])
+            net_to_update = Network.objects.filter(net_id = net['id'])
 
             net_to_update.update(
                 org     = new_org,
@@ -331,8 +331,8 @@ def update_devices(dash,net_id):
     Updates devices in database
     """
 
-    get_devices = dash.networks.getNetworkDevices(netID)
-    new_net= Network.objects.get(netID=netID)
+    get_devices = dash.networks.getNetworkDevices(net_id)
+    new_net= Network.objects.get(net_id=net_id)
 
     for device in get_devices:
         try:
@@ -372,7 +372,7 @@ def update_devices(dash,net_id):
 def edit_scanning_api_url(request):
     """Allows user to edit their API key"""
 
-    network_to_update = Network.objects.filter(netID=request.POST['netID'])
+    network_to_update = Network.objects.filter(net_id=request.POST['net_id'])
     network_to_update.update(
         scanningAPIURL = request.POST['scanningAPIURL']
     )

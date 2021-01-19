@@ -22,9 +22,9 @@ class Organisation(models.Model):
      *  - orgName   - Name given to the organisation
      *  - orgURL    - URL of the organisations Cisco dashboard
     """
-    orgID   = models.CharField(max_length = 200)
-    orgName = models.CharField(max_length = 200)
-    orgURL  = models.CharField(max_length = 200)
+    org_id   = models.CharField(max_length = 200)
+    org_name = models.CharField(max_length = 200)
+    org_url  = models.CharField(max_length = 200)
     apikey = models.CharField(max_length=200)
     #orgAPIOverview = models.JSONField(default=list)
 
@@ -44,8 +44,8 @@ class Network(models.Model):
     """
     org     = models.ForeignKey(Organisation, on_delete = models.CASCADE)
 
-    netID   = models.CharField(max_length = 200)
-    netName = models.CharField(max_length = 200)
+    net_id   = models.CharField(max_length = 200)
+    net_name = models.CharField(max_length = 200)
 
     slug    = models.SlugField(unique = True, default = "")
     scanningAPIURL = models.CharField(max_length=128, unique=False,default=None)

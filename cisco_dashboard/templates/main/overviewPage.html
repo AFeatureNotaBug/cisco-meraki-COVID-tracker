@@ -14,10 +14,10 @@
 <h3 class='title'>Overview</h3>
 <ul class="list-group list-group-flush">
     {% for org in allOrgs %}
-    <h4 class="text-muted orgname">{{ org.orgName }}</h4>
+    <h4 class="text-muted orgname">{{ org.org_name }}</h4>
 
     {% for network in org.network_set.all %}
-    <a class="list-group-item list-group-item-action" id="{{ network.netID }}">
+    <a class="list-group-item list-group-item-action" id="{{ network.net_id }}">
         {{ network.netName }}
 
     </a>
@@ -37,11 +37,11 @@
         <label>Scanning API URL: </label>
         <input type="text" id="scanningAPIURL" name="scanningAPIURL" placeholder="demo"
             value="{{ network.scanningAPIURL }}">
-        <input type='hidden' name='netID' id='netID' value="{{ network.netID }}">
+        <input type='hidden' name='net_id' id='net_id' value="{{ network.net_id }}">
         <button class='ciscobutton' style="height: fit-content;" type='submit'> Update Scanning API URL</button><br>
     </form>
 
-    <div id="{{network.netID}}-map" style="width: 100%;height: 400px">
+    <div id="{{network.net_id}}-map" style="width: 100%;height: 400px">
         <!-- {{maps.L_631066897785298521.my_map |safe}} -->
         <!-- <div id="map"></div> -->
     </div>
