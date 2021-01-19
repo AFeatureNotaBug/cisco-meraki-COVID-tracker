@@ -388,4 +388,3 @@ def get_coords(scanning_api_url):
     resp = requests.post(scanning_api_url,body,{"Content-Type":"application/json"})
     resp_json = resp.json()
     return resp_json['body']['data']['observations']
-
