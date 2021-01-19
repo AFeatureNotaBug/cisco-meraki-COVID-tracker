@@ -53,9 +53,9 @@ class TestAPI(TestCase):
             devnet = dash.organizations.getOrganization("549236")
 
             test_org = Organisation.objects.create(
-                orgID   = devnet['id'],
-                orgName = devnet['name'],
-                orgURL  = devnet['url'],
+                org_id   = devnet['id'],
+                org_name = devnet['name'],
+                org_url  = devnet['url'],
                 apikey = api_key
             )
             test_org.save()
@@ -65,7 +65,7 @@ class TestAPI(TestCase):
 
 
         try:
-            get_org = Organisation.objects.get(orgID = "549236")
+            get_org = Organisation.objects.get(org_id = "549236")
             self.assertEqual(get_org, test_org)
 
         except Organisation.DoesNotExist:
