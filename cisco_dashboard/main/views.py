@@ -8,14 +8,13 @@ import meraki
 
 from django.shortcuts import render
 from django.shortcuts import redirect
-
+from django.core import serializers
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 from django.urls import reverse
 import requests
 
-from django.core import serializers
 
 from main.forms import UserForm
 from main.forms import UserProfileForm
@@ -384,11 +383,9 @@ def get_coords(scanning_api_url):
     if scanning_api_url in ("",None):
         return ["Please set your scanning API URL in your profile"]
     #creation of map comes here + business logic
-    try:
-        body = {"key":"randominsert!!222_"}
-        resp = requests.post(scanning_api_url,body,{"Content-Type":"application/json"})
-        resp_json = resp.json()
-        return resp_json['body']['data']['observations']
-    except Exception as e:
-        print(e)
-        return []
+
+    body = {"key":"randominsert!!222_"}
+    resp = requests.post(scanning_api_url,body,{"Content-Type":"application/json"})
+    resp_json = resp.json()
+    return resp_json['body']['data']['observations']
+
