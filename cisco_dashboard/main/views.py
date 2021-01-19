@@ -48,7 +48,7 @@ def overview(request):
     uob = UserProfile.objects.filter(user=request.user)
     apikey =json.loads(serializers.serialize("json",uob))[0]['fields']['apikey']
     print(apikey)
-    if(apikey == None or  apikey== 'demo' or apikey == '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'):
+    if(apikey in (None, 'demo', '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'):
         print('NO APIKEY (use default)')
         apikey = '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'
 
@@ -59,7 +59,7 @@ def overview(request):
     context_dict = {
         'allOrgs':  Organisation.objects.filter(apikey = apikey),
         'coords':{}
-        }    
+        }
     for org in Organisation.objects.filter(apikey=apikey):
         context_dict[org.orgID] = Network.objects.filter(org = org)
         for net in list(Network.objects.filter(org = org)):
