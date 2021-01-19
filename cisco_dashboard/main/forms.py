@@ -32,8 +32,3 @@ class UserProfileForm(forms.ModelForm):
         """Meta"""
         model = UserProfile
         fields = ('apikey',)
-
-""" class NetworkForm(forms.ModelForm):
-    class Meta:
-        model = Network
-        fields = ('scanningAPIURL',) """
