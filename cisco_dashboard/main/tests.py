@@ -6,21 +6,16 @@ from django.contrib.auth.models import User
 # Create your tests here.
 class Register(TestCase):
     """Tests Register"""
-    def setUp(self):
-        """Sets up"""
-        '''
-        self.credentials = {
-            'username': 'testuser1',
-            'email':'549956326@qq.com',
-            'password': 'secret',
-            'apikey':'customerday1'}
-        User.objects.create_user(**self.credentials)'''
     def test_register(self):
         """Tests register"""
         # send register data
         #response = self.client.post('/register/', self.credentials, follow=True)
-        body = {'username':'aa', 'email':'549956326@qq.com','password':'secret', 'apikey':'customerday1' }
-        response = self.client.post('/register/', body, follow=True)
+        body = {'username':'aa', 
+            'email':'549956326@qq.com',
+            'password':'secret', 
+            'apikey':'customerday1'
+        }
+        self.client.post('/register/', body, follow=True)
         # should be logged in now
         print('hello register')
 #        self.assertTrue(response.context['username'].is_active)
@@ -34,7 +29,7 @@ class LogInTest(TestCase):
         User.objects.create_user(**self.credentials)
     def test_login(self):
         # send login data
-        response = self.client.post('/login/', self.credentials, follow=True)
+        self.client.post('/login/', self.credentials, follow=True)
         # should be logged in now
         print('hello login')
 #        self.assertTrue(response.context['username'].is_active)
@@ -42,8 +37,8 @@ class YourTestClass(TestCase):
     """Your Test Class"""
     @classmethod
     def setUpTestData(cls):
+        """Set up test dataa"""
         print("setUpTestData: Run once to set up non-modified data for all class methods.")
-        pass
 
 class RegisterLoginTest(TestCase):
     """Tests registration and login functionality"""
@@ -69,5 +64,6 @@ class RegisterLoginTest(TestCase):
         assert User.objects.get(username = "aa")        # Ensure user exists
 
     def test_one_plus_one_equals_two(self):
+        """Test 1 plus 1"""
         print("Method: test_one_plus_one_equals_two.")
         self.assertEqual(1 + 1, 2)
