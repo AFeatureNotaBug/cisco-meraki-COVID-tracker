@@ -17,7 +17,7 @@ Username: {{ username }}
     {% csrf_token %}
     <label>API Key: </label>
     <input  type="text" id="apikey" name="apikey" placeholder="demo" value="{{ apikey }}">
-    <button class='ciscobutton' type='submit'> Update API key</button>
+    <button class='ciscobutton' type='submit'> Update API key</button><br>
 </form>
 
 <form action='usedemokey' method='POST'>

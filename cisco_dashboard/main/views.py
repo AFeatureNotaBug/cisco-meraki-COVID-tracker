@@ -8,13 +8,13 @@ import meraki
 
 from django.shortcuts import render
 from django.shortcuts import redirect
-
+from django.core import serializers
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 from django.urls import reverse
+import requests
 
-from django.core import serializers
 
 from main.forms import UserForm
 from main.forms import UserProfileForm
@@ -40,19 +40,14 @@ def index(request):
 
     return response
 
-
 @login_required
 def overview(request):
-    """
-    Overview view
-     * Requires login
-     * Lists organisations and member networks
-    """
-
-    apikey = json.loads(serializers.serialize("json",
-    UserProfile.objects.filter(user = request.user)))[0]['fields']['apikey']
-
-    if(apikey is None or 'demo'):
+    """Main content"""
+    uob = UserProfile.objects.filter(user=request.user)
+    apikey =json.loads(serializers.serialize("json",uob))[0]['fields']['apikey']
+    print(apikey)
+    if apikey in (None, 'demo', '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'):
+        print('NO APIKEY (use default)')
         apikey = '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'
 
     else:
@@ -61,11 +56,13 @@ def overview(request):
 
     context_dict = {
         'allOrgs':  Organisation.objects.filter(apikey = apikey),
-    }
-
-    for org in Organisation.objects.all():
+        'coords':{}
+        }
+    for org in Organisation.objects.filter(apikey=apikey):
         context_dict[org.org_id] = Network.objects.filter(org = org)
-
+        for net in list(Network.objects.filter(org = org)):
+            context_dict['coords'][net.net_id] = get_coords(net.scanningAPIURL)
+    context_dict['coords'] = json.dumps(context_dict['coords'])
     return render(request, 'main/overviewPage.html', context = context_dict)
 
 
@@ -201,6 +198,7 @@ def profile(request):
     try:
         apikey = tmp_obj[0]['fields']['apikey']
         retapikey = (len(apikey) - 4) * '*' + apikey[-4:]
+        #scanningAPIURL = tmp_obj[0]['fields']['scanningAPIURL']
 
     except IndexError:
         apikey = 'Not found'
@@ -208,7 +206,8 @@ def profile(request):
     context_dict = {
         'email': request.user.email,
         'username': request.user.username,
-        'apikey': retapikey
+        'apikey': retapikey,
+        #'scanningAPIURL':scanningAPIURL
     }
 
     return render(request, 'main/profile.html', context = context_dict)
@@ -277,8 +276,8 @@ def update_organisations(dash, apikey):
 
             org_to_update.update(
                 org_id   = org['id'],
-                orgName = org['name'],
-                orgURL  = org['url'],
+                org_name = org['name'],
+                org_url  = org['url'],
                 apikey = apikey
                 #orgAPIOverview = APIOverview
             )
@@ -286,8 +285,8 @@ def update_organisations(dash, apikey):
         except Organisation.DoesNotExist:
             new_org = Organisation.objects.create(
                 org_id   = org['id'],
-                orgName = org['name'],
-                orgURL  = org['url'],
+                org_name = org['name'],
+                org_url  = org['url'],
                 apikey = apikey
                 #orgAPIOverview = APIOverview
             )
@@ -312,14 +311,14 @@ def update_network(dash,org_id):
             net_to_update.update(
                 org     = new_org,
                 net_id   = net['id'],
-                netName = net['name']
+                net_name = net['name']
             )
 
         except Network.DoesNotExist:
             new_net = Network.objects.create(
                 org     = new_org,
                 net_id   = net['id'],
-                netName = net['name']
+                net_name = net['name']
             )
 
             new_net.save()
@@ -365,5 +364,27 @@ def update_devices(dash,net_id):
 
                 devLat    = device['lat'],
                 devLong   = device['lng']
-            )
+                )
             new_device.save()
+
+
+def edit_scanning_api_url(request):
+    """Allows user to edit their API key"""
+
+    network_to_update = Network.objects.filter(net_id=request.POST['net_id'])
+    network_to_update.update(
+        scanningAPIURL = request.POST['scanningAPIURL']
+    )
+
+    return redirect('/overview')
+
+def get_coords(scanning_api_url):
+    """ gets coordinates of scanning api url"""
+    if scanning_api_url in ("",None):
+        return ["Please set your scanning API URL in your profile"]
+    #creation of map comes here + business logic
+
+    body = {"key":"randominsert!!222_"}
+    resp = requests.post(scanning_api_url,body,{"Content-Type":"application/json"})
+    resp_json = resp.json()
+    return resp_json['body']['data']['observations']

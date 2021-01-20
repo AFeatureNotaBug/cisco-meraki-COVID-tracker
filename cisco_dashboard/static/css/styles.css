@@ -117,3 +117,13 @@ a:hover{
 .orgname{
   margin-left: 10px;
 }
+
+
+
+.main-block-item{
+  display: none !important;
+}
+
+.main-block-item.active{
+  display: block !important;
+}
