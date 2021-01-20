@@ -1,12 +1,13 @@
 """Django Unit Tests"""
-import meraki
 from django.test import TestCase
 from django.contrib.auth.models import User
 #https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
 
 # Create your tests here.
-class register(TestCase):
+class Register(TestCase):
+    """Tests Register"""
     def setUp(self):
+        """Sets up"""
         '''
         self.credentials = {
             'username': 'testuser1',
@@ -15,14 +16,17 @@ class register(TestCase):
             'apikey':'customerday1'}
         User.objects.create_user(**self.credentials)'''
     def test_register(self):
+        """Tests register"""
         # send register data
         #response = self.client.post('/register/', self.credentials, follow=True)
-        response = self.client.post('/register/', {'username':'aa', 'email':'549956326@qq.com','password':'secret', 'apikey':'customerday1' }, follow=True)
+        body = {'username':'aa', 'email':'549956326@qq.com','password':'secret', 'apikey':'customerday1' }
+        response = self.client.post('/register/', body, follow=True)
         # should be logged in now
         print('hello register')
 #        self.assertTrue(response.context['username'].is_active)
 
 class LogInTest(TestCase):
+    """Tests login"""
     def setUp(self):
         self.credentials = {
             'username': 'testuser',
@@ -35,6 +39,7 @@ class LogInTest(TestCase):
         print('hello login')
 #        self.assertTrue(response.context['username'].is_active)
 class YourTestClass(TestCase):
+    """Your Test Class"""
     @classmethod
     def setUpTestData(cls):
         print("setUpTestData: Run once to set up non-modified data for all class methods.")
