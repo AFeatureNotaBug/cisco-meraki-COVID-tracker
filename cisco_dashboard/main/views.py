@@ -59,9 +59,9 @@ def overview(request):
         'coords':{}
         }
     for org in Organisation.objects.filter(apikey=apikey):
-        context_dict[org.orgID] = Network.objects.filter(org = org)
+        context_dict[org.org_id] = Network.objects.filter(org = org)
         for net in list(Network.objects.filter(org = org)):
-            context_dict['coords'][net.netID] = get_coords(net.scanningAPIURL)
+            context_dict['coords'][net.net_id] = get_coords(net.scanningAPIURL)
     context_dict['coords'] = json.dumps(context_dict['coords'])
     return render(request, 'main/overviewPage.html', context = context_dict)
 
@@ -271,8 +271,8 @@ def update_organisations(dash, apikey):
     for org in get_orgs:
 
         try:
-            Organisation.objects.get(orgID=org['id'])
-            org_to_update = Organisation.objects.filter(orgID=org['id'])
+            Organisation.objects.get(org_id=org['id'])
+            org_to_update = Organisation.objects.filter(org_id=org['id'])
 
             org_to_update.update(
                 org_id   = org['id'],

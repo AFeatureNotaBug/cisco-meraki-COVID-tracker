@@ -18,7 +18,7 @@
 
     {% for network in org.network_set.all %}
     <a class="list-group-item list-group-item-action" id="{{ network.net_id }}">
-        {{ network.netName }}
+        {{ network.net_name }}
 
     </a>
     {% endfor %}
@@ -30,7 +30,7 @@
 
 {% for org in allOrgs %}
 {% for network in org.network_set.all %}
-<a class="main-block-item" id="{{ network.netID }}-body">
+<a class="main-block-item" id="{{ network.net_id }}-body">
     {{ network.netName }}
     <form action='edit_scanning_api_url' method='POST'>
         {% csrf_token %}

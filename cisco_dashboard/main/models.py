@@ -22,13 +22,13 @@ class Organisation(models.Model):
      *  - orgName   - Name given to the organisation
      *  - orgURL    - URL of the organisations Cisco dashboard
     """
-    org_id   = models.CharField(max_length = 200)
-    org_name = models.CharField(max_length = 200)
-    org_url  = models.CharField(max_length = 200)
+    org_id = models.CharField(max_length=200)
+    org_name = models.CharField(max_length=200)
+    org_url = models.CharField(max_length=200)
     apikey = models.CharField(max_length=200)
     #orgAPIOverview = models.JSONField(default=list)
 
-    slug    = models.SlugField(unique = True, default = "")
+    slug = models.SlugField(unique=True, default="")
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.org_id)
@@ -42,16 +42,17 @@ class Network(models.Model):
      *  - netName   - Name given to this network
      *  - scanningAPIURL    - get request URL for scanning api middle server
     """
-    org     = models.ForeignKey(Organisation, on_delete = models.CASCADE)
+    org = models.ForeignKey(Organisation, on_delete=models.CASCADE)
 
-    net_id   = models.CharField(max_length = 200)
-    net_name = models.CharField(max_length = 200)
+    net_id = models.CharField(max_length=200)
+    net_name = models.CharField(max_length=200)
 
-    slug    = models.SlugField(unique = True, default = "")
-    scanningAPIURL = models.CharField(max_length=128, unique=False,default=None)
+    slug = models.SlugField(unique=True, default="")
+    scanningAPIURL = models.CharField(
+        max_length=128, unique=False, default=None)
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.netID)
+        self.slug = slugify(self.net_id)
         super().save(*args, **kwargs)
 
 
@@ -62,7 +63,7 @@ class UserProfile(models.Model):
     """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    apikey = models.CharField(max_length=128, unique=False,default=None)
+    apikey = models.CharField(max_length=128, unique=False, default=None)
     # The additional attributes we wish to include.
 
     def __str__(self):
@@ -79,21 +80,21 @@ class Device(models.Model):
      *  - devLat    - Latitude of device
      *  - devLong   - Longitude of device
     """
-    net       = models.ForeignKey(Network, on_delete = models.CASCADE)
+    net = models.ForeignKey(Network, on_delete=models.CASCADE)
 
     #devName   = models.CharField(max_length = 200)
     #devNotes  = models.CharField(max_length = 200)
-    devAddr   = models.CharField(max_length = 200)
+    devAddr = models.CharField(max_length=200)
 
-    devSerial = models.CharField(max_length = 200)
-    devMac    = models.CharField(max_length = 200)
-    devModel  = models.CharField(max_length = 200)
+    devSerial = models.CharField(max_length=200)
+    devMac = models.CharField(max_length=200)
+    devModel = models.CharField(max_length=200)
     #devLanIP  = models.CharField(max_length = 200)
 
-    devLat    = models.FloatField()
-    devLong   = models.FloatField()
+    devLat = models.FloatField()
+    devLong = models.FloatField()
 
-    slug      = models.SlugField(unique = True, default = "")
+    slug = models.SlugField(unique=True, default="")
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.devMac)
