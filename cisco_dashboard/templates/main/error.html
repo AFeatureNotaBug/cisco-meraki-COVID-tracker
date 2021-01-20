@@ -2,19 +2,23 @@
 {% load static %}
 
 {% block page_title %}
-	<h3>Home</h3>
+	<h3>Error</h3>
 {% endblock %}
 
 {% block body_block %}
-<h1>Welcome to the CS11 Meraki Dashboard</h1>
+<h1>Error: {{ error.title }}</h1>
 
-<h3>This page is still under development</h3>
 
+<p>{{ error.message }}</p>
+
+{% if error.bold %}
+<b>{{error.bold}}</b>
+{% endif %}
 {% endblock %}
 
 {% block sidebar_block %}
 <h3 class=title>
-	Pages
+	Error
 </h3>
 <ul class="list-group list-group-flush">
     <a href='/overview'>

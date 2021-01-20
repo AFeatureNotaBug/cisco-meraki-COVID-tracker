@@ -1,6 +1,8 @@
 {% extends 'main/base.html' %}
 {% load static %}
 
+{% csrf_token %}
+
 {% block page_title %}
 	<h3>Profile</h3>
 {% endblock %}
@@ -10,8 +12,22 @@ Email: {{ email }}
 <br>
 Username: {{ username }}
 <br>
-API Key: {{ apikey }}
+
+<form action='editapikey' method='POST'>
+    {% csrf_token %}
+    <label>API Key: </label>
+    <input  type="text" id="apikey" name="apikey" placeholder="demo" value="{{ apikey }}">
+    <button class='ciscobutton' type='submit'> Update API key</button><br>
+</form>
+
+<form action='usedemokey' method='POST'>
+    {% csrf_token %}
+    <button class='ciscobutton' type='submit'> Use demo key</button>
+</form>
+
+
 {% endblock %}
+
 
 {% block sidebar_block %}
 <h3 class=title>

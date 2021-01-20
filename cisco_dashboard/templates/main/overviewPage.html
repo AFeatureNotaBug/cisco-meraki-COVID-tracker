@@ -1,76 +1,182 @@
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFRlJsRV5vWGDi8AFsbdNEhgWmkY5yEGY"
+    type="text/javascript"></script>
+
 {% extends 'main/base.html' %}
 {% load static %}
 
 {% block page_title %}
-	<h3>Organisations</h3>
+<h3>Organisations</h3>
 {% endblock %}
+
 
 {% block sidebar_block %}
 <h3 class='title'>Overview</h3>
-	<ul class="list-group list-group-flush">
-		{% for org in allOrgs %}
-			<h4 class="text-muted">{{ org.orgName }}</h4>
-			
-			{% for network in org.network_set.all %}
-				<a class="list-group-item list-group-item-action" id="{{ network.netID }}">
-					{{ network.netName }}
-				</a>
-			{% endfor %}
-			
-		{% endfor %}
-	</ul>
-{% endblock %}
+<ul class="list-group list-group-flush">
+    {% for org in allOrgs %}
+    <h4 class="text-muted orgname">{{ org.org_name }}</h4>
 
+    {% for network in org.network_set.all %}
+    <a class="list-group-item list-group-item-action" id="{{ network.net_id }}">
+        {{ network.net_name }}
+
+    </a>
+    {% endfor %}
+
+    {% endfor %}
+</ul>
+{% endblock %}
 {% block body_block %}
 
+{% for org in allOrgs %}
+{% for network in org.network_set.all %}
+<a class="main-block-item" id="{{ network.net_id }}-body">
+    {{ network.netName }}
+    <form action='edit_scanning_api_url' method='POST'>
+        {% csrf_token %}
+        <label>Scanning API URL: </label>
+        <input type="text" id="scanningAPIURL" name="scanningAPIURL" placeholder="demo"
+            value="{{ network.scanningAPIURL }}">
+        <input type='hidden' name='net_id' id='net_id' value="{{ network.net_id }}">
+        <button class='ciscobutton' style="height: fit-content;" type='submit'> Update Scanning API URL</button><br>
+    </form>
+
+    <div id="{{network.net_id}}-map" style="width: 100%;height: 400px">
+        <!-- {{maps.L_631066897785298521.my_map |safe}} -->
+        <!-- <div id="map"></div> -->
+    </div>
+</a>
+{% endfor %}
+{% endfor %}
+
+<!-- PLACEHOLDER INFORMATION
 <div class='container'>
     <div class='row'>
-        
+
         <div><canvas id="chartSpace" width="400" height="400"></canvas></div>
-    
+
     </div>
-</div>
+</div> -->
 <script>
-    window.addEventListener('click', function(){
+    let map;
+
+    function initMap(nid) {
+        obj = "{{coords |escapejs}}"
+        JSONObj = JSON.parse(obj)
+        console.log(JSONObj)
+        console.log(JSONObj[nid])
+        const mapOptions = {
+            zoom: 15,
+            center: { lat: 55.87513519781043, lng: -4.285018229745873 },
+        };
+        map = new google.maps.Map(document.getElementById(nid + "-map"), mapOptions);
+        /* const marker = new google.maps.Marker({
+            // The below line is equivalent to writing:
+            // position: new google.maps.LatLng(-34.397, 150.644)
+            position: { lat: -34.397, lng: 150.644 },
+            map: map,
+        }); */
+
+        var infowindow = new google.maps.InfoWindow();
+
+        var marker, i;
+
+
+        for (i = 0; i < JSONObj[nid].length; i++) {
+            console.log(JSONObj[nid][i]['location']['lng'])
+            marker = new google.maps.Marker({
+                position: new google.maps.LatLng(JSONObj[nid][i]['location']['lat'], JSONObj[nid][i]['location']['lng']),
+                map: map
+            });
+            console.log("Marker v")
+            console.log(marker)
+
+            google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                return function () {
+                    infowindow.setContent(JSONObj[nid][i]['clientMac']);
+                    infowindow.open(map, marker);
+                }
+            })(marker, i));
+        }
+
+        // You can use a LatLng literal in place of a google.maps.LatLng object when
+        // creating the Marker object. Once the Marker object is instantiated, its
+        // position will be available as a google.maps.LatLng object. In this case,
+        // we retrieve the marker's position using the
+        // google.maps.LatLng.getPosition() method.
+        /* const infowindow = new google.maps.InfoWindow({
+            content: "<p>Marker Location:" + marker.getPosition() + "</p>",
+        });
+        google.maps.event.addListener(marker, "click", () => {
+            infowindow.open(map, marker);
+        }); */
+    }
+
+
+
+    elements = document.getElementsByClassName('list-group-item-action')
+
+    var myFunction = function () {
+        console.log(this.id)
+        var attribute = this.id;
+        tr = document.getElementsByClassName('main-block-item')
+        for (var i = 0; i < tr.length; i++) {
+            tr[i].classList.remove("active")
+        }
+        document.getElementById(attribute + '-body').classList.add("active")
+        initMap(attribute)
+        /*         let map;
+                map = new google.maps.Map(document.getElementById("map"), {
+                    center: { lat: -34.397, lng: 150.644 },
+                    zoom: 8,
+                }); */
+        //document.getElementById(attribute+'-map').innerHTML = "{{maps.L_631066897785298521.my_map |safe}}"
+        //document.getElementById(attribute+'-map').innerHTML = "<h1>this</h1>"
+    };
+
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].addEventListener('click', myFunction, false);
+    }
+    window.addEventListener('click', function () {
         console.log("running")
         var ctx = document.getElementById('chartSpace').getContext('2d');
         var myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [{
-                label: '# of Votes',
-                data: [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
+            type: 'bar',
+            data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
                 }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
             }
-        }
+        });
     });
-    });
-    
+
 </script>
 {% endblock %}
