@@ -10,9 +10,9 @@ class Register(TestCase):
         """Tests register"""
         # send register data
         #response = self.client.post('/register/', self.credentials, follow=True)
-        body = {'username':'aa', 
+        body = {'username':'aa',
             'email':'549956326@qq.com',
-            'password':'secret', 
+            'password':'secret',
             'apikey':'customerday1'
         }
         self.client.post('/register/', body, follow=True)
@@ -28,6 +28,7 @@ class LogInTest(TestCase):
             'password': 'secret'}
         User.objects.create_user(**self.credentials)
     def test_login(self):
+        """Test login"""
         # send login data
         self.client.post('/login/', self.credentials, follow=True)
         # should be logged in now
