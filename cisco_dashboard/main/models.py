@@ -71,8 +71,8 @@ class UserProfile(models.Model):
 
 class Device(models.Model):
     """Stores details of devices on a Network
-     *  - net   - The Network that this Device belongs to
-     *  - devAddr - Device's address
+     *  - net       - The Network that this Device belongs to
+     *  - devAddr   - Device's address
      *  - devSerial - Device's serial number
      *  - devMac    - Device's hardware address
      *  - devModel  - Model number of device
@@ -98,3 +98,14 @@ class Device(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.devMac)
         super().save(*args, **kwargs)
+
+
+class Snapshot(models.Model):
+    """Stores camera snapshots after collision detection
+     *  - url   - URL of the image
+     *  - time  - time of collision
+    """
+    device_serial = models.ForeignKey(Device, on_delete=models.CASCADE)
+
+    url = models.CharField(max_length=300)
+    time = models.CharField(max_length=50)
