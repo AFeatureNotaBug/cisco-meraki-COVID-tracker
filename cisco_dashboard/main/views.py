@@ -27,7 +27,6 @@ from main.models import UserProfile
 
 def index(request):
     """Index page view"""
-
     context_dict = {
         'example_text': 'THIS IS EXAMPLE TEXT',
     }
@@ -43,9 +42,9 @@ def index(request):
 @login_required
 def overview(request):
     """Main content"""
-    uob = UserProfile.objects.filter(user=request.user)
-    apikey =json.loads(serializers.serialize("json",uob))[0]['fields']['apikey']
-    print(apikey)
+    uob = UserProfile.objects.filter(user = request.user)
+    apikey = json.loads(serializers.serialize("json", uob))[0]['fields']['apikey']
+    print("\n\n\n" + apikey + "\n\n\n")
     if apikey in (None, 'demo', '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'):
         print('NO APIKEY (use default)')
         apikey = '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'
@@ -56,14 +55,42 @@ def overview(request):
 
     context_dict = {
         'allOrgs':  Organisation.objects.filter(apikey = apikey),
-        'coords':{}
-        }
+        'coords': {}
+    }
+
     for org in Organisation.objects.filter(apikey=apikey):
         context_dict[org.org_id] = Network.objects.filter(org = org)
+
         for net in list(Network.objects.filter(org = org)):
             context_dict['coords'][net.net_id] = get_coords(net.scanningAPIURL)
+
     context_dict['coords'] = json.dumps(context_dict['coords'])
+
     return render(request, 'main/overviewPage.html', context = context_dict)
+
+
+@login_required
+def alerts_page(request):
+    """Alerts page"""
+    tmp_obj = json.loads(
+        serializers.serialize(
+            "json",
+            UserProfile.objects.filter(user = request.user)
+        )
+    )
+
+    apikey = tmp_obj[0]['fields']['apikey']
+
+    dash = meraki.DashboardAPI(apikey)
+    serial = "Q2EV-TWQP-G8VX"   #Temp hardcoded serial number for ben home camera
+
+    response = dash.camera.generateDeviceCameraSnapshot(serial)
+
+    context_dict = {
+        'response': response['url']
+    }
+
+    return render(request, 'main/alerts.html', context = context_dict)
 
 
 @login_required
@@ -195,10 +222,17 @@ def profile(request):
         )
     )
 
+    print("\n\n\n")
+    print(tmp_obj)
+    print("\n\n\n")
+
+    retapikey = None
+    scanning_api_url = None
+
     try:
         apikey = tmp_obj[0]['fields']['apikey']
         retapikey = (len(apikey) - 4) * '*' + apikey[-4:]
-        #scanningAPIURL = tmp_obj[0]['fields']['scanningAPIURL']
+        scanning_api_url = tmp_obj[0]['fields']['apikey']
 
     except IndexError:
         apikey = 'Not found'
@@ -207,7 +241,7 @@ def profile(request):
         'email': request.user.email,
         'username': request.user.username,
         'apikey': retapikey,
-        #'scanningAPIURL':scanningAPIURL
+        'scanningAPIURL': scanning_api_url
     }
 
     return render(request, 'main/profile.html', context = context_dict)
@@ -227,10 +261,7 @@ def user_logout(request):
 
 
 def update_orgs(apikey):
-    """
-    Calls function to update organisations
-    """
-
+    """Calls function to update organisations"""
     dash = meraki.DashboardAPI(apikey)
     update_organisations(dash, apikey)
 
@@ -296,10 +327,7 @@ def update_organisations(dash, apikey):
 
 #updates all networks for an organization ID
 def update_network(dash,org_id):
-    """
-    Updates networks in database
-    """
-
+    """Updates networks in database"""
     get_nets = dash.organizations.getOrganizationNetworks(org_id)
     new_org = Organisation.objects.get(org_id=org_id)
 
@@ -370,13 +398,13 @@ def update_devices(dash,net_id):
 
 def edit_scanning_api_url(request):
     """Allows user to edit their API key"""
-
     network_to_update = Network.objects.filter(net_id=request.POST['net_id'])
     network_to_update.update(
         scanningAPIURL = request.POST['scanningAPIURL']
     )
 
     return redirect('/overview')
+
 
 def get_coords(scanning_api_url):
     """ gets coordinates of scanning api url"""
