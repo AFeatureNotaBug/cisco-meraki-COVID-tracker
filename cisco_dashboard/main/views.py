@@ -387,31 +387,31 @@ def get_coords(scanning_api_url):
     body = {"key":"randominsert!!222_"}
     resp = requests.post(scanning_api_url,body,{"Content-Type":"application/json"})
     resp_json = resp.json()
-    for x in range(len(resp_json['body']['data']['observations'])):
+    for outter in range(len(resp_json['body']['data']['observations'])):
         distList = []
-        for y in resp_json['body']['data']['observations']:
-            hav = haversine(resp_json['body']['data']['observations'][x]['location']['lng'],resp_json['body']['data']['observations'][x]['location']['lat'],y['location']['lng'],y['location']['lat'])
+        for inn in resp_json['body']['data']['observations']:
+            long = resp_json['body']['data']['observations'][outter]['location']['lng']
+            lat = resp_json['body']['data']['observations'][outter]['location']['lat']
+            hav = haversine(long,lat,y['location']['lng'],y['location']['lat'])
             if hav < 2:
-                distList.append("<span style='color:red'>" + "%.2f" % hav + ' - ' + y['clientMac'] + '</span>' )
+                text = "<span style='color:red'>" + "%.2f" % hav + ' - ' + inn['clientMac'] + '</span>'
             else:
-                distList.append("<span style='color:green'>" + "%.2f" % hav + ' - ' + y['clientMac'] + '</span>' )
+                text = "<span style='color:green'>" + "%.2f" % hav + ' - ' + inn['clientMac'] + '</span>'
+            distList.append(text)
 
-        resp_json['body']['data']['observations'][x]['distances'] = distList
+        resp_json['body']['data']['observations'][outter]['distances'] = distList
     print(resp_json)
     return resp_json['body']['data']['observations']
-
-
 
 def haversine(lat1, lon1, lat2, lon2):
     """ An implementation of the haversine formula to 
     caluclate distance between 2 points (long,lat) on earth)"""
     # convert decimal degrees to radians 
     lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
-
-    # haversine formula 
-    dlon = lon2 - lon1 
-    dlat = lat2 - lat1 
-    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2) ** 2
-    c = 2 * math.asin(math.sqrt(a)) 
-    r = 6371.1370 # Radius of earth km
-    return c * r * 1000
+    # haversine formula
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    arcsin = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2) ** 2
+    result = 2 * math.asin(math.sqrt(arcsin))
+    radius = 6371.1370 # Radius of earth km
+    return result * radius * 1000
