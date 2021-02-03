@@ -64,7 +64,34 @@ class RegisterLoginTest(TestCase):
         self.assertTrue(response.status_code == 200)    # Check registration was successful
         assert User.objects.get(username = "aa")        # Ensure user exists
 
-    def test_one_plus_one_equals_two(self):
-        """Test 1 plus 1"""
-        print("Method: test_one_plus_one_equals_two.")
-        self.assertEqual(1 + 1, 2)
+class ChangeAPIKeyTest(TestCase):
+    def test_correct_api(self):
+        
+    def test_change_api_key(self):
+        testdata = {
+            'username':'testuser',
+            'email':'testuser@test.com',
+            'password':'testuser',
+            'apikey':'testcase1'
+        }
+
+        testresponse = self.client.post('/register/', testdata, follow = True)  # Register new test user
+        self.assertTrue(testresponse.status_code == 200)                        # Check this was done successfully
+        assert User.objects.get(apikey = "testcase1")                           # Check 
+
+        testdatabeta = {'apikey':'testcase2'}
+        self.client.post('/editapikey/', testdatabeta, follow=True)
+        assert User.objects.get(apikey = "testcase2")
+
+class LogOutTest():
+    def setUp(self):
+        self.credentials = {
+            'username': 'testuser',
+            'password': 'secret'}
+        User.objects.create_user(**self.credentials)
+
+    def test_logout(self):
+        #Login first so the option to logout is availible
+        self.client.post('/login/', self.credentials, follow=True)
+        response = self.client.post('/logout/', self.credentials, follow=True)
+        self.assertTrue(response.status_code == 200)
