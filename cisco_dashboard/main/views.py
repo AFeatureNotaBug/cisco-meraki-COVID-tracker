@@ -370,7 +370,7 @@ def update_devices(dash,net_id):
 
 
 def edit_scanning_api_url(request):
-    """Allows user to edit their API key"""
+    """Allows user to edit their scanning API key"""
 
     network_to_update = Network.objects.filter(net_id=request.POST['net_id'])
     network_to_update.update(
