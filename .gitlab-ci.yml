@@ -42,9 +42,11 @@ test:unit_tests:
         - virtualenv -p python3 venv
         - source venv/bin/activate
         - pip3 install -r requirements.txt
+        - pip3 install coverage
         
         # Set up and run tests
         - python3 manage.py makemigrations 
         - python3 manage.py migrate
         - python3 manage.py test
+        - coverage run ./manage.py test --noinput && coverage report
 
