@@ -93,7 +93,8 @@
 
             google.maps.event.addListener(marker, 'click', (function (marker, i) {
                 return function () {
-                    infowindow.setContent(JSONObj[nid][i]['clientMac']);
+                    //infowindow.setContent(JSONObj[nid][i]['clientMac']);
+                    infowindow.setContent(JSONObj[nid][i]['manufacturer'] + ' - ' + JSONObj[nid][i]['clientMac'] + '<br>' + JSONObj[nid][i]['distances'].join('<br>'));
                     infowindow.open(map, marker);
                 }
             })(marker, i));

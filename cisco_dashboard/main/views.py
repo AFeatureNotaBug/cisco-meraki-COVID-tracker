@@ -4,6 +4,7 @@
 """
 
 import json
+import math
 import meraki
 
 from django.shortcuts import render
@@ -415,4 +416,32 @@ def get_coords(scanning_api_url):
     body = {"key":"randominsert!!222_"}
     resp = requests.post(scanning_api_url,body,{"Content-Type":"application/json"})
     resp_json = resp.json()
+    for outter in range(len(resp_json['body']['data']['observations'])):
+        dist_list = []
+        for inn in resp_json['body']['data']['observations']:
+            long = resp_json['body']['data']['observations'][outter]['location']['lng']
+            lat = resp_json['body']['data']['observations'][outter]['location']['lat']
+            hav = haversine(long,lat,inn['location']['lng'],inn['location']['lat'])
+            if hav < 2:
+                text = "<span style='color:red'>" + "%.2f" % hav
+            else:
+                text = "<span style='color:green'>" + "%.2f" % hav
+            text+= ' - ' + inn['clientMac'] + '</span>'
+            dist_list.append(text)
+
+        resp_json['body']['data']['observations'][outter]['distances'] = dist_list
+    print(resp_json)
     return resp_json['body']['data']['observations']
+
+def haversine(lat1, lon1, lat2, lon2):
+    """ An implementation of the haversine formula to
+    caluclate distance between 2 points (long,lat) on earth)"""
+    # convert decimal degrees to radians
+    lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
+    # haversine formula
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    arcsin = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2) ** 2
+    result = 2 * math.asin(math.sqrt(arcsin))
+    radius = 6371.1370 # Radius of earth km
+    return result * radius * 1000
