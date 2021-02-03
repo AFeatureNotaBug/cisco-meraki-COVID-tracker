@@ -1,4 +1,7 @@
 {% extends 'main/base.html' %}
+
+{% load crispy_forms_tags %}
+
 {% load static %}
 
 {% block title_block %}
@@ -9,6 +12,7 @@
 <h1>Login to Main</h1>
 <form id="login_form" method="post" action="{% url 'login' %}">
     {% csrf_token %}
+    {{ form|crispy }}
     Username: <input type="text" name="username" value="" size="50" />
     <br />
     Password: <input type="password" name="password" value="" size="50" />
