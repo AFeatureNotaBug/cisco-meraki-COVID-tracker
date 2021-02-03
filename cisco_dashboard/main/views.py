@@ -24,6 +24,7 @@ from main.models import Organisation
 from main.models import Network
 from main.models import Device
 from main.models import UserProfile
+from main.models import Snapshot
 
 
 def index(request):
@@ -39,6 +40,7 @@ def index(request):
     )
 
     return response
+
 
 @login_required
 def overview(request):
@@ -63,7 +65,7 @@ def overview(request):
         context_dict[org.org_id] = Network.objects.filter(org = org)
 
         for net in list(Network.objects.filter(org = org)):
-            context_dict['coords'][net.net_id] = get_coords(net.scanningAPIURL)
+            context_dict['coords'][net.net_id] = get_coords(request, net.scanningAPIURL)
 
     context_dict['coords'] = json.dumps(context_dict['coords'])
 
@@ -325,7 +327,6 @@ def update_organisations(dash, apikey):
             new_org.save()
 
 
-
 #updates all networks for an organization ID
 def update_network(dash,org_id):
     """Updates networks in database"""
@@ -407,7 +408,7 @@ def edit_scanning_api_url(request):
     return redirect('/overview')
 
 
-def get_coords(scanning_api_url):
+def get_coords(request, scanning_api_url):
     """ gets coordinates of scanning api url"""
     if scanning_api_url in ("",None):
         return ["Please set your scanning API URL in your profile"]
@@ -424,6 +425,33 @@ def get_coords(scanning_api_url):
             hav = haversine(long,lat,inn['location']['lng'],inn['location']['lat'])
             if hav < 2:
                 text = "<span style='color:red'>" + "%.2f" % hav
+                
+                #Create snapshot if more than one person in camera zone (entire frame)
+                tmp_obj = json.loads(
+                    serializers.serialize(
+                        "json",
+                        UserProfile.objects.filter(user = request.user)
+                    )
+                )
+
+                apikey = tmp_obj[0]['fields']['apikey'] #Get apikey
+                dash = meraki.DashboardAPI(apikey)
+
+                serial = "Q2EV-TWQP-G8VX"   #Temp hardcoded serial number for ben home camera
+                analytics_response = dash.camera.getDeviceCameraAnalyticsOverview(serial)
+
+                if analytics_response['entrances'] > 1: #More than one person in zone
+                    url_response = dash.camera.generateDeviceCameraSnapshot(serial) #Pic
+                    all_users = UserProfile.objects.filter(user = request.user)
+
+                    for user_profile in all_users:
+                        new_snapshot = Snapshot.objects.create(
+                            user = user,
+                            url = url_response['url'],
+                            time = 1
+                        )
+                        new_snapshot.save()
+
             else:
                 text = "<span style='color:green'>" + "%.2f" % hav
             text+= ' - ' + inn['clientMac'] + '</span>'
@@ -433,6 +461,7 @@ def get_coords(scanning_api_url):
     print(resp_json)
     return resp_json['body']['data']['observations']
 
+
 def haversine(lat1, lon1, lat2, lon2):
     """ An implementation of the haversine formula to
     caluclate distance between 2 points (long,lat) on earth)"""
@@ -441,7 +470,10 @@ def haversine(lat1, lon1, lat2, lon2):
     # haversine formula
     dlon = lon2 - lon1
     dlat = lat2 - lat1
+
     arcsin = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2) ** 2
+
     result = 2 * math.asin(math.sqrt(arcsin))
     radius = 6371.1370 # Radius of earth km
+
     return result * radius * 1000

@@ -102,10 +102,11 @@ class Device(models.Model):
 
 class Snapshot(models.Model):
     """Stores camera snapshots after collision detection
+     *  - user  - User snapshot belongs to
      *  - url   - URL of the image
      *  - time  - time of collision
     """
-    device_serial = models.ForeignKey(Device, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
     url = models.CharField(max_length=300)
     time = models.CharField(max_length=50)
