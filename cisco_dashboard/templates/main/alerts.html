@@ -2,13 +2,17 @@
 {% load static %}
 
 {% block page_title %}
-	<h3>Home</h3>
+	<h3>Alerts</h3>
 {% endblock %}
 
 {% block body_block %}
-<h1>Welcome to the CS11 Meraki Dashboard</h1>
+<h1>Alerts</h1>
+<h2>This is the alerts page</h2>
 
-<h3>This page is still under development</h3>
+<h3>Major Alerts</h3>
+{% if response %}
+	<a href={{ response }}>Click here</a><br />
+{% endif %}
 
 {% endblock %}
 
