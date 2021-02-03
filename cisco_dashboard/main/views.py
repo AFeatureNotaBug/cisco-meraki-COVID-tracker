@@ -425,7 +425,7 @@ def get_coords(request, scanning_api_url):
             hav = haversine(long,lat,inn['location']['lng'],inn['location']['lat'])
             if hav < 2:
                 text = "<span style='color:red'>" + "%.2f" % hav
-                
+
                 #Create snapshot if more than one person in camera zone (entire frame)
                 tmp_obj = json.loads(
                     serializers.serialize(
@@ -446,7 +446,7 @@ def get_coords(request, scanning_api_url):
 
                     for user_profile in all_users:
                         new_snapshot = Snapshot.objects.create(
-                            user = user,
+                            user = user_profile,
                             url = url_response['url'],
                             time = 1
                         )
