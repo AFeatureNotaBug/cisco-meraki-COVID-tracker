@@ -65,8 +65,6 @@ class RegisterLoginTest(TestCase):
         assert User.objects.get(username = "aa")        # Ensure user exists
 
 class ChangeAPIKeyTest(TestCase):
-    def test_correct_api(self):
-        
     def test_change_api_key(self):
         testdata = {
             'username':'testuser',
