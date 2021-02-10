@@ -47,7 +47,7 @@ def overview(request):
     """Main content"""
     uob = UserProfile.objects.filter(user = request.user)
     apikey = json.loads(serializers.serialize("json", uob))[0]['fields']['apikey']
-    print("\n\n\n" + apikey + "\n\n\n")
+
     if apikey in (None, 'demo', '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'):
         print('NO APIKEY (use default)')
         apikey = '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'
@@ -58,7 +58,7 @@ def overview(request):
 
     context_dict = {
         'allOrgs':  Organisation.objects.filter(apikey = apikey),
-        'coords': {}
+        'coords': dict()
     }
 
     for org in Organisation.objects.filter(apikey=apikey):
@@ -75,22 +75,11 @@ def overview(request):
 @login_required
 def alerts_page(request):
     """Alerts page"""
-    tmp_obj = json.loads(
-        serializers.serialize(
-            "json",
-            UserProfile.objects.filter(user = request.user)
-        )
-    )
-
-    apikey = tmp_obj[0]['fields']['apikey']
-
-    dash = meraki.DashboardAPI(apikey)
-    serial = "Q2EV-TWQP-G8VX"   #Temp hardcoded serial number for ben home camera
-
-    response = dash.camera.generateDeviceCameraSnapshot(serial)
-
+    user_snapshots = Snapshot.objects.filter(user = request.user)
+    
     context_dict = {
-        'response': response['url']
+        "snapshots": [s for s in user_snapshots]
+        #'response': response['url']
     }
 
     return render(request, 'main/alerts.html', context = context_dict)
@@ -224,10 +213,6 @@ def profile(request):
             UserProfile.objects.filter(user = request.user)
         )
     )
-
-    print("\n\n\n")
-    print(tmp_obj)
-    print("\n\n\n")
 
     retapikey = None
     scanning_api_url = None
@@ -415,7 +400,11 @@ def get_coords(request, scanning_api_url):
     #creation of map comes here + business logic
 
     body = {"key":"randominsert!!222_"}
-    resp = requests.post(scanning_api_url,body,{"Content-Type":"application/json"})
+    resp = requests.post(scanning_api_url, body, {"Content-Type":"application/json"})
+    
+    print("\n\n\n", resp, "\n\n\n")
+    print(resp.json(), "\n\n\n")
+    
     resp_json = resp.json()
     for outter in range(len(resp_json['body']['data']['observations'])):
         dist_list = []
@@ -438,19 +427,20 @@ def get_coords(request, scanning_api_url):
                 dash = meraki.DashboardAPI(apikey)
 
                 serial = "Q2EV-TWQP-G8VX"   #Temp hardcoded serial number for ben home camera
-                analytics_response = dash.camera.getDeviceCameraAnalyticsOverview(serial)
 
-                if analytics_response['entrances'] > 1: #More than one person in zone
-                    url_response = dash.camera.generateDeviceCameraSnapshot(serial) #Pic
-                    all_users = UserProfile.objects.filter(user = request.user)
+                #analytics_response = dash.camera.getDeviceCameraAnalyticsOverview(serial)
+                #if analytics_response['entrances'] > 1: #More than one person in zone
 
-                    for user_profile in all_users:
-                        new_snapshot = Snapshot.objects.create(
-                            user = user_profile,
-                            url = url_response['url'],
-                            time = 1
-                        )
-                        new_snapshot.save()
+                url_response = dash.camera.generateDeviceCameraSnapshot(serial) #Pic
+                all_users = UserProfile.objects.filter(user = request.user)
+
+                for user_profile in all_users:
+                    new_snapshot = Snapshot.objects.create(
+                        user = user_profile.user,
+                        url = url_response['url'],
+                        time = 1
+                    )
+                    new_snapshot.save()
 
             else:
                 text = "<span style='color:green'>" + "%.2f" % hav
@@ -458,7 +448,10 @@ def get_coords(request, scanning_api_url):
             dist_list.append(text)
 
         resp_json['body']['data']['observations'][outter]['distances'] = dist_list
+    
+    print("\n\n\n\n")
     print(resp_json)
+    print("\n\n\n\n")
     return resp_json['body']['data']['observations']
 
 

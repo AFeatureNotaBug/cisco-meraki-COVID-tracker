@@ -106,7 +106,7 @@ class Snapshot(models.Model):
      *  - url   - URL of the image
      *  - time  - time of collision
     """
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     url = models.CharField(max_length=300)
     time = models.CharField(max_length=50)
