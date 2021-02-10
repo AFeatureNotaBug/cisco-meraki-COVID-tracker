@@ -48,7 +48,7 @@ class Network(models.Model):
     net_name = models.CharField(max_length=200)
 
     slug = models.SlugField(unique=True, default="")
-    scanningAPIURL = models.CharField(max_length=128, unique=False, default=None)
+    scanningAPIURL = models.CharField(max_length=128, unique=False, default=None, null=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.net_id)
