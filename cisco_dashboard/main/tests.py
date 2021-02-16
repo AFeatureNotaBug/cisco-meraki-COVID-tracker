@@ -68,7 +68,7 @@ class RegisterLoginTest(TestCase):
 class ChangeAPIKeyTest(TestCase):
     def test_change_api_key(self):
         testdata = {
-            'username':'testuser',
+            'username':'testuseralpha',
             'email':'testuser@test.com',
             'password':'testuser',
             'apikey':'testcase1'
@@ -78,19 +78,27 @@ class ChangeAPIKeyTest(TestCase):
 
         testdatabeta = {'apikey':'testcase2'}
         self.client.post('/editapikey/', testdatabeta, follow=True)
-        user = UserProfile.objects.get(apikey='testcase2')
-        self.assertEqual(user.apikey, 'testcase2')
+        assert User.userprofile.objects.get(apikey = "testcase2")
 
 
-class LogOutTest():
+class LogOutTest(TestCase):
+    def setUp(self):
+        self.credentials = {
+            'username': 'testuserbeta',
+            'password': 'secret'}
+        User.objects.create_user(**self.credentials)
+    def test_logout(self):
+        #Login first so the option to logout is availible
+        self.client.post('/login/', self.credentials, follow=True)
+        response = self.client.post('/logout/', self.credentials, follow=True)
+        print(response.status_code)
+        self.assertTrue(response.status_code == 304)
+
+class UseDemoKeyTest(TestCase):
     def setUp(self):
         self.credentials = {
             'username': 'testuser',
             'password': 'secret'}
         User.objects.create_user(**self.credentials)
-
-    def test_logout(self):
-        #Login first so the option to logout is availible
-        self.client.post('/login/', self.credentials, follow=True)
-        response = self.client.post('/logout/', self.credentials, follow=True)
-        self.assertTrue(response.status_code == 200)
+    #def test_demo_key(self):
+        
