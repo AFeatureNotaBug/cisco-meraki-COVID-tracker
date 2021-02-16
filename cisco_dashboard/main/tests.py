@@ -1,6 +1,7 @@
 """Django Unit Tests"""
 from django.test import TestCase
 from django.contrib.auth.models import User
+from .models import *
 #https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
 
 # Create your tests here.
@@ -73,13 +74,13 @@ class ChangeAPIKeyTest(TestCase):
             'apikey':'testcase1'
         }
 
-        testresponse = self.client.post('/register/', testdata, follow = True)  # Register new test user
-        self.assertTrue(testresponse.status_code == 200)                        # Check this was done successfully
-        assert User.objects.get(apikey = "testcase1")                           # Check 
+        user = User.objects.create_user(testdata)                    # Check APIKey has been made
 
         testdatabeta = {'apikey':'testcase2'}
         self.client.post('/editapikey/', testdatabeta, follow=True)
-        assert User.objects.get(apikey = "testcase2")
+        user = UserProfile.objects.get(apikey='testcase2')
+        self.assertEqual(user.apikey, 'testcase2')
+
 
 class LogOutTest():
     def setUp(self):
