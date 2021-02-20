@@ -76,10 +76,9 @@ def overview(request):
 def alerts_page(request):
     """Alerts page"""
     user_snapshots = Snapshot.objects.filter(user = request.user)
-    
+
     context_dict = {
-        "snapshots": [s for s in user_snapshots]
-        #'response': response['url']
+        "snapshots": list(user_snapshots)
     }
 
     return render(request, 'main/alerts.html', context = context_dict)
@@ -379,7 +378,7 @@ def update_devices(dash,net_id):
 
                 devLat    = device['lat'],
                 devLong   = device['lng']
-                )
+            )
             new_device.save()
 
 
@@ -401,10 +400,7 @@ def get_coords(request, scanning_api_url):
 
     body = {"key":"randominsert!!222_"}
     resp = requests.post(scanning_api_url, body, {"Content-Type":"application/json"})
-    
-    print("\n\n\n", resp, "\n\n\n")
-    print(resp.json(), "\n\n\n")
-    
+
     resp_json = resp.json()
     for outter in range(len(resp_json['body']['data']['observations'])):
         dist_list = []
@@ -448,10 +444,7 @@ def get_coords(request, scanning_api_url):
             dist_list.append(text)
 
         resp_json['body']['data']['observations'][outter]['distances'] = dist_list
-    
-    print("\n\n\n\n")
-    print(resp_json)
-    print("\n\n\n\n")
+
     return resp_json['body']['data']['observations']
 
 
