@@ -85,12 +85,17 @@ def editapikey(request):
     """Allows user to edit their API key"""
 
     user_to_update = UserProfile.objects.filter(user=request.user)
+    error = False
+    try:
+        meraki.DashboardAPI(request.POST['apikey']).organizations.getOrganizations()
+    except meraki.exceptions.APIError:
+        error=True
 
     user_to_update.update(
         apikey = request.POST['apikey']
     )
 
-    return redirect('/profile')
+    return render(request, 'main/profile.html',context={'error':error})
 
 
 def register(request):
@@ -244,7 +249,13 @@ def update_all_networks(apikey):
     dash = meraki.DashboardAPI(apikey)
     update_organisations(dash, apikey)
 
-    for org in dash.organizations.getOrganizations():
+    try:
+        orgs = dash.organizations.getOrganizations()
+    except meraki.exceptions.APIError:
+        print('401 api key invalid')
+        return
+
+    for org in orgs:
         update_network(dash,org['id'])
 
 
@@ -255,9 +266,12 @@ def update_all(apikey):
 
     dash = meraki.DashboardAPI(apikey)
     update_organisations(dash,apikey)
-
-    for org in dash.organizations.getOrganizations():
-        update_network(dash,org['id'])
+    try:
+        for org in dash.organizations.getOrganizations():
+            update_network(dash,org['id'])
+    except meraki.exceptions.APIError:
+        print('401 api key invalid')
+        return
         #for net in dash.organizations.getOrganizationNetworks(org['id']):
         #update_devices(dash,net['id'])
 
@@ -267,8 +281,11 @@ def update_organisations(dash, apikey):
     Updates organisations in database
     """
 
-    get_orgs = dash.organizations.getOrganizations() #Get all organizations
-
+    try:
+        get_orgs = dash.organizations.getOrganizations() #Get all organizations
+    except meraki.exceptions.APIError:
+        print('401 api key invalid')
+        return
     for org in get_orgs:
 
         try:
@@ -301,8 +318,12 @@ def update_network(dash,org_id):
     Updates networks in database
     """
 
-    get_nets = dash.organizations.getOrganizationNetworks(org_id)
-    new_org = Organisation.objects.get(org_id=org_id)
+    try:
+        get_nets = dash.organizations.getOrganizationNetworks(org_id)
+        new_org = Organisation.objects.get(org_id=org_id)
+    except meraki.exceptions.APIError:
+        print('401 api key invalid')
+        return
 
     for net in get_nets:
         try:
@@ -331,8 +352,12 @@ def update_devices(dash,net_id):
     Updates devices in database
     """
 
-    get_devices = dash.networks.getNetworkDevices(net_id)
-    new_net= Network.objects.get(net_id=net_id)
+    try:
+        get_devices = dash.networks.getNetworkDevices(net_id)
+        new_net= Network.objects.get(net_id=net_id)
+    except meraki.exceptions.APIError:
+        print('401 api key invalid')
+        return
 
     for device in get_devices:
         try:
