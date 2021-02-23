@@ -3,10 +3,10 @@
  * Contains all views used in the Cisco Dashboard web app
 """
 
+import datetime
 import json
 import math
 import meraki
-import datetime
 
 from django.shortcuts import render
 from django.shortcuts import redirect
