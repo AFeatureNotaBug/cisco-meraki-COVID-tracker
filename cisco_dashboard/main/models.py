@@ -5,14 +5,8 @@
  *  - Device Model         - Stores details of devices retrieved using Networks
 """
 
-# The below line disables an error caused due to Django formatting
-# pylint: disable=E:101
-
-
 from django.db import models
 from django.contrib.auth.models import User
-#from django.db.models.signals import post_save
-#from django.dispatch import receiver
 from django.template.defaultfilters import slugify
 
 
@@ -26,7 +20,6 @@ class Organisation(models.Model):
     org_name = models.CharField(max_length=200)
     org_url = models.CharField(max_length=200)
     apikey = models.CharField(max_length=200)
-    #orgAPIOverview = models.JSONField(default=list)
 
     slug = models.SlugField(unique=True, default="")
 
@@ -63,7 +56,6 @@ class UserProfile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     apikey = models.CharField(max_length=128, unique=False, default=None)
-    # The additional attributes we wish to include.
 
     def __str__(self):
         return self.user.username
@@ -81,14 +73,10 @@ class Device(models.Model):
     """
     net = models.ForeignKey(Network, on_delete=models.CASCADE)
 
-    #devName   = models.CharField(max_length = 200)
-    #devNotes  = models.CharField(max_length = 200)
     devAddr = models.CharField(max_length=200)
-
     devSerial = models.CharField(max_length=200)
     devMac = models.CharField(max_length=200)
     devModel = models.CharField(max_length=200)
-    #devLanIP  = models.CharField(max_length = 200)
 
     devLat = models.FloatField()
     devLong = models.FloatField()
@@ -108,5 +96,5 @@ class Snapshot(models.Model):
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    url = models.CharField(max_length=300)
+    url = models.CharField(max_length=500)
     time = models.CharField(max_length=50)

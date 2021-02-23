@@ -6,6 +6,7 @@
 import json
 import math
 import meraki
+import datetime
 
 from django.shortcuts import render
 from django.shortcuts import redirect
@@ -425,16 +426,18 @@ def get_coords(request, scanning_api_url):
                 serial = "Q2EV-TWQP-G8VX"   #Temp hardcoded serial number for ben home camera
 
                 #analytics_response = dash.camera.getDeviceCameraAnalyticsOverview(serial)
-                #if analytics_response['entrances'] > 1: #More than one person in zone
 
+                #if analytics_response['entrances'] > 1: #More than one person in zone
                 url_response = dash.camera.generateDeviceCameraSnapshot(serial) #Pic
+                current_time = datetime.datetime.now()
+
                 all_users = UserProfile.objects.filter(user = request.user)
 
                 for user_profile in all_users:
                     new_snapshot = Snapshot.objects.create(
                         user = user_profile.user,
                         url = url_response['url'],
-                        time = 1
+                        time = current_time.strftime("%c")
                     )
                     new_snapshot.save()
 
