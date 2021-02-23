@@ -291,8 +291,6 @@ def update_all(apikey):
     except meraki.exceptions.APIError:
         print('401 api key invalid')
         return
-        
-
 
 def update_organisations(dash, apikey):
     """
@@ -489,4 +487,3 @@ def haversine(lat1, lon1, lat2, lon2):
     radius = 6371.1370 # Radius of earth km
 
     return result * radius * 1000
-
