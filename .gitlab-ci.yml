@@ -16,7 +16,7 @@ test:code_quality:
         - pip3 install meraki
         
         #The --disable=W0222 flag is required due to Django formatting
-        - pylint --disable=W0222 models.py -r y # Checks that models.py is correctly formatted
+        - pylint --disable=E1101 --disable=W0222 models.py -r y # Checks that models.py is correctly formatted
         
         #The --disable=R0903 flag is required due to Django formatting
         - pylint --disable=R0903 forms.py -r y  # Checks that forms.py is correctly formatted
