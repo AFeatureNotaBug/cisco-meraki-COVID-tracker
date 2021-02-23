@@ -10,9 +10,9 @@
 <h2>This is the alerts page</h2>
 
 <h3>Major Alerts</h3>
-{% if response %}
-	<a href={{ response }}>Click here</a><br />
-{% endif %}
+{% for snap in snapshots %}
+	<a href={{ snap.url }}>Snapshot taken at time {{ snap.time }}</a><br />
+{% endfor %}
 
 {% endblock %}
 
