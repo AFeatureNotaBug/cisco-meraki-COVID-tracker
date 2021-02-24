@@ -19,7 +19,6 @@
     {% for network in org.network_set.all %}
     <a class="list-group-item list-group-item-action" id="{{ network.net_id }}">
         {{ network.net_name }}
-
     </a>
     {% endfor %}
 
@@ -28,25 +27,49 @@
 {% endblock %}
 {% block body_block %}
 
-{% for org in allOrgs %}
-{% for network in org.network_set.all %}
-<a class="main-block-item" id="{{ network.net_id }}-body">
-    {{ network.netName }}
-    <form action='edit_scanning_api_url' method='POST'>
-        {% csrf_token %}
-        <label>Scanning API URL: </label>
-        <input type="text" id="scanningAPIURL" name="scanningAPIURL" placeholder="demo"
-            value="{{ network.scanningAPIURL }}">
-        <input type='hidden' name='net_id' id='net_id' value="{{ network.net_id }}">
-        <button class='ciscobutton' style="height: fit-content;" type='submit'> Update Scanning API URL</button><br>
-    </form>
+<div style='display:flex; justify-content: space-between;padding-bottom:60px'>
+{% if allOrgs %}
+    <span>🌐 Number of organisations: {{allOrgs|length}}</span>
+{% else %}
+    <span>No organisations</span>
+{% endif %}
+{% if networks %}
+    <span>📡 Number of networks: {{networks}}</span>
+{% endif %}
+{% if devices %}
+    <span>📱 Number of devices: {{devices}}</span>
+{% endif %}
+{% if aps %}
+    <span>🎥 Number of access points: {{aps}}</span>
+{% endif %}
+{% if cameras %}
+    <span>📶 Number of cameras: {{cameras}}</span>
+{% endif %}
+</div>
 
-    <div id="{{network.net_id}}-map" style="width: 100%;height: 400px">
-        <!-- {{maps.L_631066897785298521.my_map |safe}} -->
-        <!-- <div id="map"></div> -->
-    </div>
+<a class="main-block-item active" id="default-body">
+    <h3>&#8592; Select network to see device map </h3>
 </a>
-{% endfor %}
+
+{% for org in allOrgs %}
+    {% for network in org.network_set.all %}
+        <a class="main-block-item" id="{{ network.net_id }}-body">
+            {{ network.netName }}
+            <form action='edit_scanning_api_url' method='POST'>
+                {% csrf_token %}
+                <label>Scanning API URL: </label>
+                <input type="text" id="scanningAPIURL" name="scanningAPIURL" placeholder="demo"
+                    value="{{ network.scanningAPIURL }}">
+                <input type='hidden' name='net_id' id='net_id' value="{{ network.net_id }}">
+                <button class='ciscobutton' style="height: fit-content;" type='submit'> Update Scanning API URL</button><br>
+            </form>
+
+            <div id="{{network.net_id}}-map" style="width: 100%;height: 400px">
+                <!-- {{maps.L_631066897785298521.my_map |safe}} -->
+                <!-- <div id="map"></div> -->
+            </div>
+        </a>
+    {% endfor %}
 {% endfor %}
 
 <!-- PLACEHOLDER INFORMATION

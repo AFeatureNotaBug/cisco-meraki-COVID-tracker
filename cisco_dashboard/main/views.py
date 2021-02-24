@@ -31,7 +31,10 @@ from main.models import Snapshot
 def index(request):
     """Index page view"""
     context_dict = {
-        'example_text': 'THIS IS EXAMPLE TEXT',
+        'users':len(UserProfile.objects.all()),
+        'networks':len(Network.objects.all()),
+        'orgs':len(Organisation.objects.all()),
+        'devices':len(Device.objects.all())
     }
 
     response = render(
@@ -58,13 +61,24 @@ def overview(request):
 
     context_dict = {
         'allOrgs':  Organisation.objects.filter(apikey = apikey),
-        'coords': dict()
+        'coords': dict(),
+        'networks':0,
+        'devices':0,
+        'aps':0,
+        'cameras':0,
     }
 
     for org in Organisation.objects.filter(apikey=apikey):
         context_dict[org.org_id] = Network.objects.filter(org = org)
 
         for net in list(Network.objects.filter(org = org)):
+            context_dict['devices'] += len(Device.objects.filter(net=net))
+            for d in Device.objects.filter(net=net):
+                if(d.devModel == 'MV12N'):
+                    context_dict['cameras'] += 1
+                elif(d.devModel =='MR30H'):
+                    context_dict['aps'] +=1
+            context_dict['networks'] += 1
             context_dict['coords'][net.net_id] = get_coords(request, net.scanningAPIURL)
 
     context_dict['coords'] = json.dumps(context_dict['coords'])
@@ -112,7 +126,33 @@ def editapikey(request):
         apikey = request.POST['apikey']
     )
 
-    return render(request, 'main/profile.html',context={'error':error})
+    tmp_obj = json.loads(
+        serializers.serialize(
+            "json",
+            UserProfile.objects.filter(user = request.user)
+        )
+    )
+
+    retapikey = None
+    scanning_api_url = None
+
+    try:
+        apikey = tmp_obj[0]['fields']['apikey']
+        retapikey = (len(apikey) - 4) * '*' + apikey[-4:]
+        scanning_api_url = tmp_obj[0]['fields']['apikey']
+
+    except IndexError:
+        apikey = 'Not found'
+
+    context_dict = {
+        'email': request.user.email,
+        'username': request.user.username,
+        'apikey': retapikey,
+        'scanningAPIURL': scanning_api_url,
+        'error':error
+    }
+
+    return render(request, 'main/profile.html',context=context_dict)
 
 
 def register(request):
@@ -404,6 +444,18 @@ def update_devices(dash,net_id):
 
 def edit_scanning_api_url(request):
     """Allows user to edit their API key"""
+    if request.POST['scanningAPIURL'] in ("",None):
+        return ["Please set your scanning API URL in your profile"]
+    #creation of map comes here + business logic
+
+    body = {"key":"randominsert!!222_"}
+    resp = requests.post(request.POST['scanningAPIURL'], body, {"Content-Type":"application/json"})
+    found = False
+
+    try:
+        resp_json = resp.json()
+    except json.decoder.JSONDecodeError:
+        return redirect('/overview')
     network_to_update = Network.objects.filter(net_id=request.POST['net_id'])
     network_to_update.update(
         scanningAPIURL = request.POST['scanningAPIURL']
@@ -422,14 +474,17 @@ def get_coords(request, scanning_api_url):
     resp = requests.post(scanning_api_url, body, {"Content-Type":"application/json"})
     found = False
 
-    resp_json = resp.json()
+    try:
+        resp_json = resp.json()
+    except json.decoder.JSONDecodeError:
+        return []
     for outter in range(len(resp_json['body']['data']['observations'])):
         dist_list = []
         for inn in resp_json['body']['data']['observations']:
             long = resp_json['body']['data']['observations'][outter]['location']['lng']
             lat = resp_json['body']['data']['observations'][outter]['location']['lat']
             hav = haversine(long,lat,inn['location']['lng'],inn['location']['lat'])
-            if hav < 2:
+            if hav < 2 and hav == 0:
                 text = "<span style='color:red'>" + "%.2f" % hav
                 found = True
             else:

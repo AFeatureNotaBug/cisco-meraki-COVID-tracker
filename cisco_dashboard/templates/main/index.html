@@ -8,8 +8,32 @@
 {% block body_block %}
 <h1>Welcome to the CS11 Meraki Dashboard</h1>
 
-<h3>This page is still under development</h3>
-
+<div style='display:flex;justify-content: space-around;text-align:center'>
+{% if users %}
+	<div class='overview-item'>
+		<p>Total users</p>
+		<h3>{{users}}</h3>
+	</div>
+{% endif %}
+{% if orgs %}
+	<div  class='overview-item'>
+		<p>Total organisations</p>
+		<h3>{{orgs}}</h3>
+	</div>
+{% endif %}
+{% if networks %}
+	<div class='overview-item'>
+		<p>Total networks</p>
+		<h3>{{networks}}</h3>
+	</div>
+{% endif %}
+{% if devices %}
+	<div class='overview-item'>
+		<p>Total devices</p>
+		<h3>{{users}}</h3>
+	</div>
+{% endif %}
+</div>
 {% endblock %}
 
 {% block sidebar_block %}

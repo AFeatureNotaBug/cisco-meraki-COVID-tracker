@@ -137,3 +137,15 @@ a:hover{
 .register{
   background-color: #D5D8DE;
 }
+
+.overview-item{
+  flex: 1 1 0px;
+  display:flex;
+  flex-direction: column;
+  margin:10px;
+  padding:5px;
+  border-radius: 5px;
+  background-color: #4A5160;
+  color: #8A92A5;
+  
+}
