@@ -25,6 +25,10 @@ Username: {{ username }}
     <button class='ciscobutton' type='submit'> Use demo key</button>
 </form>
 
+{% if error %}
+    <h1>Error, invalid API key!</h1>
+{% endif %}
+
 
 {% endblock %}
 
