@@ -31,7 +31,8 @@ class LogInTest(TestCase):
     def test_login(self):
         """Test login"""
         # send login data
-        self.client.post('/login/', self.credentials, follow=True)
+        x = self.client.post('/login/', self.credentials, follow=True)
+        print(x)
         # should be logged in now
         print('hello login')
 #        self.assertTrue(response.context['username'].is_active)
@@ -74,13 +75,17 @@ class ChangeAPIKeyTest(TestCase):
             'apikey':'testcase1'
         }
 
-        user = User.objects.create_user(testdata)                    # Check APIKey has been made
+        self.credentials = {
+            'username': 'testuseralpha',
+            'password': 'testuser'}
 
+        self.client.post('/register/', testdata, follow=True)
+        x = self.client.login(username=testdata['username'],password=testdata['password'])
         testdatabeta = {'apikey':'testcase2'}
-        self.client.post('/editapikey/', testdatabeta, follow=True)
-        assert User.userprofile.objects.get(apikey = "testcase2")
-
-
+        b = self.client.post('/editapikey', testdatabeta, follow=True)
+        user = User.objects.get(username=testdata['username'])
+        userprofile = UserProfile.objects.get(user = user)
+        assert (userprofile.apikey == testdatabeta['apikey'])
 class LogOutTest(TestCase):
     def setUp(self):
         self.credentials = {
