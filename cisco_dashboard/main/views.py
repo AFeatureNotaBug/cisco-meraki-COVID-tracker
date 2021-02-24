@@ -54,8 +54,7 @@ def overview(request):
         apikey = '6bec40cf957de430a6f1f2baa056b99a4fac9ea0'
 
     else:
-        update_orgs(apikey)
-        update_all_networks(apikey)
+        update_all(apikey)
 
     context_dict = {
         'allOrgs':  Organisation.objects.filter(apikey = apikey),
@@ -103,12 +102,17 @@ def editapikey(request):
     """Allows user to edit their API key"""
 
     user_to_update = UserProfile.objects.filter(user=request.user)
+    error = False
+    try:
+        meraki.DashboardAPI(request.POST['apikey']).organizations.getOrganizations()
+    except meraki.exceptions.APIError:
+        error=True
 
     user_to_update.update(
         apikey = request.POST['apikey']
     )
 
-    return redirect('/profile')
+    return render(request, 'main/profile.html',context={'error':error})
 
 
 def register(request):
@@ -262,7 +266,13 @@ def update_all_networks(apikey):
     dash = meraki.DashboardAPI(apikey)
     update_organisations(dash, apikey)
 
-    for org in dash.organizations.getOrganizations():
+    try:
+        orgs = dash.organizations.getOrganizations()
+    except meraki.exceptions.APIError:
+        print('401 api key invalid')
+        return
+
+    for org in orgs:
         update_network(dash,org['id'])
 
 
@@ -273,20 +283,25 @@ def update_all(apikey):
 
     dash = meraki.DashboardAPI(apikey)
     update_organisations(dash,apikey)
-
-    for org in dash.organizations.getOrganizations():
-        update_network(dash,org['id'])
-        #for net in dash.organizations.getOrganizationNetworks(org['id']):
-        #update_devices(dash,net['id'])
-
+    try:
+        for org in dash.organizations.getOrganizations():
+            update_network(dash,org['id'])
+            for net in dash.organizations.getOrganizationNetworks(org['id']):
+                update_devices(dash,net['id'])
+    except meraki.exceptions.APIError:
+        print('401 api key invalid')
+        return
 
 def update_organisations(dash, apikey):
     """
     Updates organisations in database
     """
 
-    get_orgs = dash.organizations.getOrganizations() #Get all organizations
-
+    try:
+        get_orgs = dash.organizations.getOrganizations() #Get all organizations
+    except meraki.exceptions.APIError:
+        print('401 api key invalid')
+        return
     for org in get_orgs:
 
         try:
@@ -345,8 +360,12 @@ def update_devices(dash,net_id):
     Updates devices in database
     """
 
-    get_devices = dash.networks.getNetworkDevices(net_id)
-    new_net= Network.objects.get(net_id=net_id)
+    try:
+        get_devices = dash.networks.getNetworkDevices(net_id)
+        new_net= Network.objects.get(net_id=net_id)
+    except meraki.exceptions.APIError:
+        print('401 api key invalid')
+        return
 
     for device in get_devices:
         try:
@@ -401,6 +420,7 @@ def get_coords(request, scanning_api_url):
 
     body = {"key":"randominsert!!222_"}
     resp = requests.post(scanning_api_url, body, {"Content-Type":"application/json"})
+    found = False
 
     resp_json = resp.json()
     for outter in range(len(resp_json['body']['data']['observations'])):
@@ -411,42 +431,43 @@ def get_coords(request, scanning_api_url):
             hav = haversine(long,lat,inn['location']['lng'],inn['location']['lat'])
             if hav < 2:
                 text = "<span style='color:red'>" + "%.2f" % hav
-
-                #Create snapshot if more than one person in camera zone (entire frame)
-                tmp_obj = json.loads(
-                    serializers.serialize(
-                        "json",
-                        UserProfile.objects.filter(user = request.user)
-                    )
-                )
-
-                apikey = tmp_obj[0]['fields']['apikey'] #Get apikey
-                dash = meraki.DashboardAPI(apikey)
-
-                serial = "Q2EV-TWQP-G8VX"   #Temp hardcoded serial number for ben home camera
-
-                #analytics_response = dash.camera.getDeviceCameraAnalyticsOverview(serial)
-
-                #if analytics_response['entrances'] > 1: #More than one person in zone
-                url_response = dash.camera.generateDeviceCameraSnapshot(serial) #Pic
-                current_time = datetime.datetime.now()
-
-                all_users = UserProfile.objects.filter(user = request.user)
-
-                for user_profile in all_users:
-                    new_snapshot = Snapshot.objects.create(
-                        user = user_profile.user,
-                        url = url_response['url'],
-                        time = current_time.strftime("%c")
-                    )
-                    new_snapshot.save()
-
+                found = True
             else:
                 text = "<span style='color:green'>" + "%.2f" % hav
             text+= ' - ' + inn['clientMac'] + '</span>'
             dist_list.append(text)
 
         resp_json['body']['data']['observations'][outter]['distances'] = dist_list
+
+    if found:
+        #Create snapshot if more than one person in camera zone (entire frame)
+        tmp_obj = json.loads(
+            serializers.serialize(
+                "json",
+                UserProfile.objects.filter(user = request.user)
+            )
+        )
+
+        apikey = tmp_obj[0]['fields']['apikey'] #Get apikey
+        dash = meraki.DashboardAPI(apikey)
+
+        serial = "Q2EV-TWQP-G8VX"   #Temp hardcoded serial number for ben home camera
+
+        #analytics_response = dash.camera.getDeviceCameraAnalyticsOverview(serial)
+
+        #if analytics_response['entrances'] > 1: #More than one person in zone
+        url_response = dash.camera.generateDeviceCameraSnapshot(serial) #Pic
+        current_time = datetime.datetime.now()
+
+        all_users = UserProfile.objects.filter(user = request.user)
+
+        for user_profile in all_users:
+            new_snapshot = Snapshot.objects.create(
+                user = user_profile.user,
+                url = url_response['url'],
+                time = current_time.strftime("%c")
+            )
+            new_snapshot.save()
 
     return resp_json['body']['data']['observations']
 
