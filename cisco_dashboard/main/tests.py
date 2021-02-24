@@ -80,30 +80,41 @@ class ChangeAPIKeyTest(TestCase):
             'password': 'testuser'}
 
         self.client.post('/register/', testdata, follow=True)
-        x = self.client.login(username=testdata['username'],password=testdata['password'])
+        self.client.login(username=testdata['username'],password=testdata['password'])
         testdatabeta = {'apikey':'testcase2'}
-        b = self.client.post('/editapikey', testdatabeta, follow=True)
+        self.client.post('/editapikey', testdatabeta, follow=True)
         user = User.objects.get(username=testdata['username'])
         userprofile = UserProfile.objects.get(user = user)
         assert (userprofile.apikey == testdatabeta['apikey'])
+
 class LogOutTest(TestCase):
-    def setUp(self):
+    def test_logout(self):
         self.credentials = {
             'username': 'testuserbeta',
-            'password': 'secret'}
-        User.objects.create_user(**self.credentials)
-    def test_logout(self):
+            'email':'testuser@test.com',
+            'password': 'secret',
+            'apikey':'testcase1'
+            }
+        self.client.post('/register/', self.credentials, follow=True)
         #Login first so the option to logout is availible
-        self.client.post('/login/', self.credentials, follow=True)
+        self.client.login(username=self.credentials['username'],password=self.credentials['password'])
         response = self.client.post('/logout/', self.credentials, follow=True)
         print(response.status_code)
-        self.assertTrue(response.status_code == 304)
+        self.assertTrue(response.status_code == 200)
 
 class UseDemoKeyTest(TestCase):
-    def setUp(self):
-        self.credentials = {
+    def test_demo_key(self):
+        testprofile = {
             'username': 'testuser',
-            'password': 'secret'}
-        User.objects.create_user(**self.credentials)
-    #def test_demo_key(self):
+            'email':'testuser@test.com',
+            'password': 'secret',
+            'apikey':'testcase1'
+            }
+        self.client.post('/register/', testprofile, follow=True)
+        self.client.login(username=testprofile['username'],password=testprofile['password'])
+        req = self.client.post('/usedemokey', follow=True)
+        user = User.objects.get(username=testprofile['username'])
+        userprofile = UserProfile.objects.get(user = user)
+        testdatabeta = {'apikey':'demo'}
+        self.assertEqual(userprofile.apikey, testdatabeta['apikey'])
         
