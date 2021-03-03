@@ -37,7 +37,14 @@ If the command ```python manage.py runserver``` executes successfully, you may n
 
 From here you may wish to register an account with your Meraki API key. Guidance on allowing API access and generating an API key for your Meraki Dashboard can be found [here](https://documentation.meraki.com/General_Administration/Other_Topics/Cisco_Meraki_Dashboard_API) ```IMAGE FOR ACCOUNT CREATION HERE```
 
-After creating an account and logging in, the overview page will be populated with your Meraki organisation details once visited ```IMAGE OF POPULATED OVERVIEW PAGE```.
+After creating an account and logging in, the overview page will be populated with your Meraki organisation details once visited. Initial load times may be slow, this is due to the system populating the database with all obtainable Meraki details based on your API key, on later visits to the overview page these details will be updated and load times will be much shorter. ```IMAGE OF POPULATED OVERVIEW PAGE```.
+
+### Collision Detection
+```IMAGE OF SCANNING API URL INPUT BOX``` ```DETAILS ABOUT SETTING UP LISTENING SERVER``` Once the listening server is created, the URL can be entered into the field on the Overview page which will then populate the database with details of device positions.
+
+When devices are detected as being within two metres of one another, a minor alert will be flagged in the system and a relevant camera will be checked to see if it has detected people within two metres of one another. If the camera has detected two or more people within two metres of one another, the alert will be moved into the "major alerts" category and a picture will be grabbed from the camera. If the camera has not detected two or more people within two metres of one another, the alert will remain in the "minor alerts" category.
+
+Alerts, as described above, may be viewed on the Alerts page.
 
 
 
