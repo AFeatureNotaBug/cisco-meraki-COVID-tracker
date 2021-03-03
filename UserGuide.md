@@ -33,4 +33,12 @@ The web app can be run and hosted locally by navigating to the cisco\_dashboard 
 
 
 ### Using the Web App
+If the command ```python manage.py runserver``` executes successfully, you may navigate to the URL "127.0.0.1:8000" by default in order to view the web app when hosted locally.
+
+From here you may wish to register an account with your Meraki API key. Guidance on allowing API access and generating an API key for your Meraki Dashboard can be found [here](https://documentation.meraki.com/General_Administration/Other_Topics/Cisco_Meraki_Dashboard_API) ```IMAGE FOR ACCOUNT CREATION HERE```
+
+After creating an account and logging in, the overview page will be populated with your Meraki organisation details once visited ```IMAGE OF POPULATED OVERVIEW PAGE```.
+
+
+
 
