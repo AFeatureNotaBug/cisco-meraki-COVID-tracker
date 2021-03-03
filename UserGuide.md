@@ -44,7 +44,7 @@ After creating an account and logging in, the overview page will be populated wi
 
 When devices are detected as being within two metres of one another, a minor alert will be flagged in the system and a relevant camera will be checked to see if it has detected people within two metres of one another. If the camera has detected two or more people within two metres of one another, the alert will be moved into the "major alerts" category and a picture will be grabbed from the camera. If the camera has not detected two or more people within two metres of one another, the alert will remain in the "minor alerts" category.
 
-Alerts, as described above, may be viewed on the Alerts page.
+Alerts, as described above, may be viewed on the Alerts page. ```IMAGE OF ALERTS PAGE```
 
 
 
