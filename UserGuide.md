@@ -13,6 +13,9 @@ Below is a list of hardware that the team used when designing the project. (Note
 The requirements for Python can be found on the [Python website](https://www.python.org/)
 
 ## Setup
+### Setting up the Hardware
+
+
 ### Optional: Creating a Virtual Environment
 
 
@@ -26,3 +29,8 @@ After navigating to the cisco\_dashboard folder, or the folder containing the "m
 Next, these migrations must be applied using the command ```python manage.py migrate```. If this command fails, the command ```python manage.py migrate --run-syncdb ``` may work but is not recommended.
 
 ### Running the Web App
+The web app can be run and hosted locally by navigating to the cisco\_dashboard folder, or the folder containing the "manage.py" file, and using the command ```python manage.py runserver```. You may wish to test that the code will execute successfully, in which case use the command ```python manage.py test```, the output should read "OK" if all tests were passed, or it will indicate which of the tests has failed.
+
+
+### Using the Web App
+
