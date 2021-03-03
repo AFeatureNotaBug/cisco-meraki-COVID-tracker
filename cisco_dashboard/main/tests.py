@@ -1,48 +1,12 @@
 """Django Unit Tests"""
+import meraki
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .models import *
+from django.contrib.auth import authenticate
 #https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
 
 # Create your tests here.
-class Register(TestCase):
-    """Tests Register"""
-    def test_register(self):
-        """Tests register"""
-        # send register data
-        #response = self.client.post('/register/', self.credentials, follow=True)
-        body = {'username':'aa',
-            'email':'549956326@qq.com',
-            'password':'secret',
-            'apikey':'customerday1'
-        }
-        self.client.post('/register/', body, follow=True)
-        # should be logged in now
-        print('hello register')
-#        self.assertTrue(response.context['username'].is_active)
-
-class LogInTest(TestCase):
-    """Tests login"""
-    def setUp(self):
-        self.credentials = {
-            'username': 'testuser',
-            'password': 'secret'}
-        User.objects.create_user(**self.credentials)
-    def test_login(self):
-        """Test login"""
-        # send login data
-        x = self.client.post('/login/', self.credentials, follow=True)
-        print(x)
-        # should be logged in now
-        print('hello login')
-#        self.assertTrue(response.context['username'].is_active)
-class YourTestClass(TestCase):
-    """Your Test Class"""
-    @classmethod
-    def setUpTestData(cls):
-        """Set up test dataa"""
-        print("setUpTestData: Run once to set up non-modified data for all class methods.")
-
 class RegisterLoginTest(TestCase):
     """Tests registration and login functionality"""
     def test_register_and_login(self):
@@ -65,6 +29,48 @@ class RegisterLoginTest(TestCase):
 
         self.assertTrue(response.status_code == 200)    # Check registration was successful
         assert User.objects.get(username = "aa")        # Ensure user exists
+
+        user = authenticate(username='aa', password='secret')         # Login with register details
+        self.assertTrue((user is not None) and user.is_authenticated) # Assert login was successful
+
+
+class TestAPI(TestCase):
+    """Simple API Test.
+     *  Retrieves DevNet Sandbox organisation using the test API key
+     *  Creates a db object for the organisation
+     *  Checks that creation was successful
+    """
+
+    def test_api_call_and_model(self):
+        """
+         * This function retrieves the DevNet Sandbox organisation and stores it in the db
+         * The organisation will then be retrieved and checked
+        """
+        api_key = "6bec40cf957de430a6f1f2baa056b99a4fac9ea0"    # Test API keys
+        dash = meraki.DashboardAPI(api_key) # Set up dash using API keys
+
+        try:
+            devnet = dash.organizations.getOrganization("549236")
+
+            test_org = Organisation.objects.create(
+                org_id   = devnet['id'],
+                org_name = devnet['name'],
+                org_url  = devnet['url'],
+                apikey = api_key
+            )
+            test_org.save()
+
+        except meraki.exceptions.APIError:
+            assert False
+
+
+        try:
+            get_org = Organisation.objects.get(org_id = "549236")
+            self.assertEqual(get_org, test_org)
+
+        except Organisation.DoesNotExist:
+            assert False
+
 
 class ChangeAPIKeyTest(TestCase):
     def test_change_api_key(self):
@@ -89,18 +95,20 @@ class ChangeAPIKeyTest(TestCase):
 
 class LogOutTest(TestCase):
     def test_logout(self):
-        self.credentials = {
-            'username': 'testuserbeta',
+        testprofile = {
+            'username': 'testuser',
             'email':'testuser@test.com',
             'password': 'secret',
             'apikey':'testcase1'
             }
-        self.client.post('/register/', self.credentials, follow=True)
+        self.client.post('/register/', testprofile, follow=True)
+        self.client.login(username=testprofile['username'],password=testprofile['password'])
         #Login first so the option to logout is availible
-        self.client.login(username=self.credentials['username'],password=self.credentials['password'])
-        response = self.client.post('/logout/', self.credentials, follow=True)
-        print(response.status_code)
-        self.assertTrue(response.status_code == 200)
+        user = User.objects.get(username=testprofile['username'])
+        self.assertTrue(user.is_authenticated) # This works fine
+        response = self.client.get('/logout/')
+        print(response)
+        self.assertTrue(response.status_code == 304)
 
 class UseDemoKeyTest(TestCase):
     def test_demo_key(self):
