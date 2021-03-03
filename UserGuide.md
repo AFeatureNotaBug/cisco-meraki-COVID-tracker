@@ -7,8 +7,10 @@ Below is a list of hardware that the team used when designing the project. (Note
 - 3 Meraki MV12 Mini Dome Cameras
 
 ## Required Software
+- Python 3.6 or later
+- Python requests library
 - Django version 3.1 or later
-- Python 3.6 or later  
+- Meraki version 1.2.0 or later
 
 The requirements for Python can be found on the [Python website](https://www.python.org/)
 
