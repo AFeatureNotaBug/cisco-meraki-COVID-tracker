@@ -40,7 +40,19 @@ class RegisterLoginTest(TestCase):
 class TestUsername(TestCase):
     """Tests username """
     def test_username(self):
-        user_name = 'Ruofan'
+        user_creds = {
+            'username': 'testuser',
+            'email': 'user@test.com',
+            'password': 'secret',
+            'apikey': 'customerday1'
+        }
+
+        self.client.post(
+            '/register/',
+            user_creds,
+            follow=True
+        )
+        user_name = 'testuser'
         user = User.objects.get(username=user_name)
         assert user
 
