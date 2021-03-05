@@ -60,7 +60,6 @@ class TestUsername(TestCase):
 class TestEmail(TestCase):
     """Tests user email"""
     def test_email(self):
-        user_email = '2356466399@qq.com'
         user_creds = {
             'username': 'testuser',
             'email': 'user@test.com',
