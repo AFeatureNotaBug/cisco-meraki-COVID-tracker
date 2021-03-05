@@ -49,6 +49,19 @@ class TestEmail(TestCase):
     """Tests user email"""
     def test_email(self):
         user_email = '2356466399@qq.com'
+        user_creds = {
+            'username': 'testuser',
+            'email': 'user@test.com',
+            'password': 'secret',
+            'apikey': 'customerday1'
+        }
+
+        self.client.post(
+            '/register/',
+            user_creds,
+            follow=True
+        )
+        user_email = 'user@test.com'
         user = User.objects.get(email=user_email)
         assert user
 
