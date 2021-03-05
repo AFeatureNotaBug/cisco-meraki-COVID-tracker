@@ -1,10 +1,11 @@
 """Django Unit Tests"""
+from django.contrib.auth import authenticate
 import meraki
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .models import *
-from django.contrib.auth import authenticate
-
+from models import UserProfile
+from models import Organisation
 
 # https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
 
@@ -40,6 +41,7 @@ class RegisterLoginTest(TestCase):
 class TestUsername(TestCase):
     """Tests username """
     def test_username(self):
+        """ Tests username """
         user_creds = {
             'username': 'testuser',
             'email': 'user@test.com',
@@ -60,6 +62,7 @@ class TestUsername(TestCase):
 class TestEmail(TestCase):
     """Tests user email"""
     def test_email(self):
+        """ Tests emails """
         user_creds = {
             'username': 'testuser',
             'email': 'user@test.com',
@@ -115,7 +118,9 @@ class TestAPI(TestCase):
 
 
 class ChangeAPIKeyTest(TestCase):
+    """ Tests changing the api key for a user """
     def test_change_api_key(self):
+        """ Tests changing the api key for a user """
         testdata = {
             'username': 'testuseralpha',
             'email': 'testuser@test.com',
@@ -134,7 +139,6 @@ class ChangeAPIKeyTest(TestCase):
         user = User.objects.get(username=testdata['username'])
         userprofile = UserProfile.objects.get(user=user)
         assert userprofile.apikey == testdatabeta['apikey']
-
 
 '''
 class LogOutTest(TestCase):
@@ -155,10 +159,10 @@ class LogOutTest(TestCase):
         print(response)
         self.assertFalse(user.is_authenticated)
 '''
-
-
 class UseDemoKeyTest(TestCase):
+    """ Tests if using the demo key works """
     def test_demo_key(self):
+        """ Tests if using the demo key works """
         testprofile = {
             'username': 'testuser',
             'email': 'testuser@test.com',
@@ -167,7 +171,7 @@ class UseDemoKeyTest(TestCase):
         }
         self.client.post('/register/', testprofile, follow=True)
         self.client.login(username=testprofile['username'], password=testprofile['password'])
-        req = self.client.post('/usedemokey', follow=True)
+        self.client.post('/usedemokey', follow=True)
         user = User.objects.get(username=testprofile['username'])
         userprofile = UserProfile.objects.get(user=user)
         testdatabeta = {'apikey': 'demo'}
