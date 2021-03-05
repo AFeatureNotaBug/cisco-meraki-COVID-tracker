@@ -37,20 +37,20 @@ class RegisterLoginTest(TestCase):
         self.assertTrue((user is not None) and user.is_authenticated)  # Assert login was successful
 
 
-# class TestUsername(TestCase):
-#     """Tests username """
-#     def test_username(self):
-#         user_name = 'Ruofan'
-#         user = User.objects.get(username=user_name)
-#         assert user
-#
-#
-# class TestEmail(TestCase):
-#     """Tests user email"""
-#     def test_email(self):
-#         user_email = '2356466399@qq.com'
-#         user = User.objects.get(email=user_email)
-#         assert user
+class TestUsername(TestCase):
+    """Tests username """
+    def test_username(self):
+        user_name = 'Ruofan'
+        user = User.objects.get(username=user_name)
+        assert user
+
+
+class TestEmail(TestCase):
+    """Tests user email"""
+    def test_email(self):
+        user_email = '2356466399@qq.com'
+        user = User.objects.get(email=user_email)
+        assert user
 
 
 class TestAPI(TestCase):
