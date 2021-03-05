@@ -109,7 +109,7 @@ class ChangeAPIKeyTest(TestCase):
         self.client.post('/editapikey', testdatabeta, follow=True)
         user = User.objects.get(username=testdata['username'])
         userprofile = UserProfile.objects.get(user=user)
-        assert (userprofile.apikey == testdatabeta['apikey'])
+        assert userprofile.apikey == testdatabeta['apikey']
 
 
 '''
