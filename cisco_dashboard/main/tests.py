@@ -1,9 +1,8 @@
 """Django Unit Tests"""
-from django.contrib.auth import authenticate
 import meraki
+from django.contrib.auth import authenticate
 from django.test import TestCase
 from django.contrib.auth.models import User
-from .models import *
 from .models import UserProfile
 from .models import Organisation
 
@@ -128,10 +127,6 @@ class ChangeAPIKeyTest(TestCase):
             'apikey': 'testcase1'
         }
 
-        self.credentials = {
-            'username': 'testuseralpha',
-            'password': 'testuser'}
-
         self.client.post('/register/', testdata, follow=True)
         self.client.login(username=testdata['username'], password=testdata['password'])
         testdatabeta = {'apikey': 'testcase2'}
@@ -140,25 +135,6 @@ class ChangeAPIKeyTest(TestCase):
         userprofile = UserProfile.objects.get(user=user)
         assert userprofile.apikey == testdatabeta['apikey']
 
-'''
-class LogOutTest(TestCase):
-    def test_logout(self):
-        testprofile = {
-            'username': 'testuser',
-            'email':'testuser@test.com',
-            'password': 'secret',
-            'apikey':'testcase1'
-            }
-        self.client.post('/register/', testprofile, follow=True)
-        self.client.login(username=testprofile['username'],password=testprofile['password'])
-        #Login first so the option to logout is availible
-        user = User.objects.get(username=testprofile['username'])
-        self.assertTrue(user.is_authenticated) # This works fine
-        #response = self.client.logout()
-        response = self.client.post('/logout/', follow=True)
-        print(response)
-        self.assertFalse(user.is_authenticated)
-'''
 class UseDemoKeyTest(TestCase):
     """ Tests if using the demo key works """
     def test_demo_key(self):
