@@ -4,8 +4,8 @@ import meraki
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .models import *
-from models import UserProfile
-from models import Organisation
+from .models import UserProfile
+from .models import Organisation
 
 # https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
 
