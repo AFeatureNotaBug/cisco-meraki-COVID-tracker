@@ -127,3 +127,13 @@ a:hover{
 .main-block-item.active{
   display: block !important;
 }
+
+.card{
+  background-color: #30343D; 
+  color:#67B346;
+  width: 500px;
+}
+
+.register{
+  background-color: #D5D8DE;
+}
