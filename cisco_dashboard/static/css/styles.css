@@ -149,3 +149,20 @@ a:hover{
   color: #8A92A5;
   
 }
+
+.card-body input{
+  background-color: transparent;
+  color: white;
+}
+
+.submit-button{
+  color: #67B346;
+}
+
+#username{
+  margin-bottom: 10px;
+}
+
+#password{
+  margin-bottom: 10px;
+}
