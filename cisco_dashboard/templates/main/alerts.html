@@ -11,7 +11,21 @@
 
 <h3>Major Alerts</h3>
 {% for snap in snapshots %}
-	<a href={{ snap.url }}>Snapshot taken at time {{ snap.time }}</a><br />
+	<div class="card mb-3" style="max-width: 540px;">
+		<div class="row g-0">
+		  <div class="col-md-4">
+			<img src="{{ snap.url }}" alt="Card image cap" class="card-img-top embed-responsive-item">
+		  </div>
+		  <div class="col-md-8">
+			<div class="card-body">
+			  <h5 class="card-title">Snaphsot Alert</h5>
+			  <p class="card-text">An alert was triggered at {{ snap.user }} and a Snaphot was taken.</p>
+			  <a href={{ snap.url }} class="btn btn-primary">Full Image</a>
+			  <p class="card-text"><small class="text-muted">Snap taken at {{ snap.time }}</small></p>
+			</div>
+		  </div>
+		</div>
+	  </div>
 {% endfor %}
 
 {% endblock %}

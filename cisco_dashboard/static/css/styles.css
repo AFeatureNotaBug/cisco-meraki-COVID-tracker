@@ -127,3 +127,12 @@ a:hover{
 .main-block-item.active{
   display: block !important;
 }
+
+.card {
+  border-color: #67B346;
+}
+
+
+.embed-respondive .card-img-top {
+  object-fit: cover;
+}
