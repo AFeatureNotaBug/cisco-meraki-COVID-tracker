@@ -15,17 +15,17 @@
     <br style="line-height: 250px;">
     <div class="row flex-vert-center flex-grow justify-content-center" >
         <!-- <div class="col-12 col-xl-4 col-lg-12">   -->
-            <div class="card" style="width: 500px;">
+            <div class="card" style="width: 80%;">
                 <div class="card-body">
 
                     <div class="row justify-content-center">  
                         <form action="{% url 'register' %}"  method="POST">
                             {% csrf_token %} 
                             <h4 class="card-title text-center" style="padding-top: 20px; padding-bottom: 20px;">Register your account</h4>
-                            <div class="form-group" style="text-align: center">
+                            <div class="form-group" style="text-align: left">
                                 {{ user_form.as_p }}
                             </div>
-                            <div class="form-group" style="text-align: center">
+                            <div class="form-group" style="text-align: left">
                                 {{ profile_form.as_p }}
                             </div> 
                         <center><input type="submit" name="submit" value="Register"></center>
