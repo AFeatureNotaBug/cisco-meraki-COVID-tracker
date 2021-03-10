@@ -48,15 +48,18 @@ def get_coords(scanning_api_url,apikey,serial):
         url_response = dash.camera.generateDeviceCameraSnapshot(serial) #Pic
         current_time = datetime.datetime.now()
 
-        all_users = UserProfile.objects.filter(apikey = apikey)
+        #all_users = UserProfile.objects.filter(apikey = apikey)
+        user = UserProfile.objects.get(user = request.user)
+        organisation = Organisation.objects.get(apikey = user.apikey)
 
-        for user_profile in all_users:
-            new_snapshot = Snapshot.objects.create(
-                user = user_profile.user,
-                url = url_response['url'],
-                time = current_time.strftime("%c")
-            )
-            new_snapshot.save()
+
+        #for user_profile in all_users:
+        new_snapshot = Snapshot.objects.create(
+            org = organisation,
+            url = url_response['url'],
+            time = current_time.strftime("%c")
+        )
+        new_snapshot.save()
 
     return resp_json['body']['data']['observations']
 

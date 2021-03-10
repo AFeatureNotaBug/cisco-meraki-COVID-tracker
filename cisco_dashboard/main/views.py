@@ -75,7 +75,9 @@ def overview(request):
 @login_required
 def alerts_page(request):
     """Alerts page"""
-    user_snapshots = Snapshot.objects.filter(user = request.user)
+    user = UserProfile.objects.get(user=request.user)
+    org = Organisation.objects.get(apikey=user.apikey)
+    user_snapshots = Snapshot.objects.filter(org =org)
 
     context_dict = {
         "snapshots": list(user_snapshots)
@@ -438,37 +440,6 @@ def get_coords(request, scanning_api_url):
             dist_list.append(text)
 
         resp_json['body']['data']['observations'][outter]['distances'] = dist_list
-
-    if found:
-        #Create snapshot if more than one person in camera zone (entire frame)
-        tmp_obj = json.loads(
-            serializers.serialize(
-                "json",
-                UserProfile.objects.filter(user = request.user)
-            )
-        )
-
-        apikey = tmp_obj[0]['fields']['apikey'] #Get apikey
-        dash = meraki.DashboardAPI(apikey)
-
-        serial = "Q2EV-TWQP-G8VX"   #Temp hardcoded serial number for ben home camera
-
-        analytics_response = dash.camera.getDeviceCameraAnalyticsOverview(serial)
-
-        if analytics_response[0]['entrances'] > 1: #More than one person in zone
-            print(analytics_response[0]['entrances'], "ENTRANCES\n\n\n")
-            url_response = dash.camera.generateDeviceCameraSnapshot(serial) #Pic
-            current_time = datetime.datetime.now()
-
-            all_users = UserProfile.objects.filter(user = request.user)
-
-            for user_profile in all_users:
-                new_snapshot = Snapshot.objects.create(
-                    user = user_profile.user,
-                    url = url_response['url'],
-                    time = current_time.strftime("%c")
-                )
-                new_snapshot.save()
 
     return resp_json['body']['data']['observations']
 
