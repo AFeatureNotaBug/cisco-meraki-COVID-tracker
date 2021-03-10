@@ -128,16 +128,6 @@ a:hover{
   display: block !important;
 }
 
-<<<<<<< HEAD
-.card {
-  border-color: #67B346;
-}
-
-
-.embed-respondive .card-img-top {
-  object-fit: cover;
-}
-=======
 .card{
   background-color: #30343D; 
   color:#67B346;
@@ -147,4 +137,3 @@ a:hover{
 .register{
   background-color: #D5D8DE;
 }
->>>>>>> 1ace42e040311f07bc1ba15e59613450d4609e5a
