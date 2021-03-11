@@ -152,3 +152,34 @@ class UseDemoKeyTest(TestCase):
         userprofile = UserProfile.objects.get(user=user)
         testdatabeta = {'apikey': 'demo'}
         self.assertEqual(userprofile.apikey, testdatabeta['apikey'])
+
+class AlertsTest(TestCase):
+    """ Tests alerts """
+    def test_alerts(self):
+        """ Tests alerts """
+        testprofile = {
+            'username': 'testuser',
+            'email': 'testuser@test.com',
+            'password': 'secret',
+            'apikey': 'testcase1'
+        }
+        self.client.post('/register/', testprofile, follow=True)
+        self.client.login(username=testprofile['username'], password=testprofile['password'])
+        x = self.client.post('/alerts/', follow=True)
+        print(x)
+
+
+class OverviewTest(TestCase):
+    """ Tests overview page """
+    def test_Overview(self):
+        """ Tests overview page """
+        testprofile = {
+            'username': 'testuser',
+            'email': 'testuser@test.com',
+            'password': 'secret',
+            'apikey': 'testcase1'
+        }
+        self.client.post('/register/', testprofile, follow=True)
+        self.client.login(username=testprofile['username'], password=testprofile['password'])
+        x = self.client.post('/overview/', follow=True)
+        print(x['coords'])
