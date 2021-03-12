@@ -183,3 +183,4 @@ class OverviewTest(TestCase):
         self.client.login(username=testprofile['username'], password=testprofile['password'])
         res = self.client.get('/overview', follow=True)
         self.assertTrue(res.status_code, 200)
+
