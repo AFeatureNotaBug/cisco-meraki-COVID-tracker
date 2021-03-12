@@ -165,8 +165,8 @@ class AlertsTest(TestCase):
         }
         self.client.post('/register/', testprofile, follow=True)
         self.client.login(username=testprofile['username'], password=testprofile['password'])
-        x = self.client.post('/alerts/', follow=True)
-        print(x)
+        res = self.client.post('/alerts', follow=True)
+        self.assertTrue(res.status_code == 200)
 
 
 class OverviewTest(TestCase):
@@ -181,5 +181,5 @@ class OverviewTest(TestCase):
         }
         self.client.post('/register/', testprofile, follow=True)
         self.client.login(username=testprofile['username'], password=testprofile['password'])
-        x = self.client.post('/overview/', follow=True)
-        print(x['coords'])
+        res = self.client.get('/overview', follow=True)
+        self.assertTrue(res.context['allOrgs']['id'], 1)
