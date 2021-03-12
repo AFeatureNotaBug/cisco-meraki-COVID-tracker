@@ -170,16 +170,16 @@ class AlertsTest(TestCase):
 
 
 class OverviewTest(TestCase):
-    """ Tests overview page """
+    """ Tests overview """
     def test_overview(self):
-        """ Tests overview page """
+        """ Tests overview """
         testprofile = {
             'username': 'testuser',
             'email': 'testuser@test.com',
             'password': 'secret',
-            'apikey': 'testcase1'
+            'apikey': 'demo'
         }
         self.client.post('/register/', testprofile, follow=True)
         self.client.login(username=testprofile['username'], password=testprofile['password'])
         res = self.client.get('/overview', follow=True)
-        self.assertTrue(res.context['allOrgs']['id'], 1)
+        self.assertTrue(res.status_code, 200)
