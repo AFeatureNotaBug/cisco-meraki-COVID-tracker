@@ -171,7 +171,7 @@ class AlertsTest(TestCase):
 
 class OverviewTest(TestCase):
     """ Tests overview page """
-    def test_Overview(self):
+    def test_overview(self):
         """ Tests overview page """
         testprofile = {
             'username': 'testuser',
