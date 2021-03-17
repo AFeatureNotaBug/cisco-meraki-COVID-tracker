@@ -4,7 +4,6 @@
  *  - UserProfile Model    - Stores user account details
  *  - Device Model         - Stores details of devices retrieved using Networks
 """
-
 from django.db import models
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
@@ -90,7 +89,7 @@ class Device(models.Model):
 
 class Snapshot(models.Model):
     """Stores camera snapshots after collision detection
-     *  - org  - Organisation the snapshot belongs to
+     *  - org   - Organisation the snapshot belongs to
      *  - url   - URL of the image
      *  - time  - time of collision
     """

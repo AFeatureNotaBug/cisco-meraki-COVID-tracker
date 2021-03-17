@@ -5,6 +5,7 @@
 import json
 import math
 import meraki
+import subprocess
 
 from django.shortcuts import render
 from django.shortcuts import redirect
@@ -14,7 +15,6 @@ from django.contrib.auth.decorators import login_required
 
 from django.urls import reverse
 import requests
-
 
 from main.forms import UserForm
 from main.forms import UserProfileForm
@@ -88,10 +88,12 @@ def overview(request):
 def alerts_page(request):
     """Alerts page"""
     user = UserProfile.objects.get(user=request.user)
+
     try:
         org = Organisation.objects.get(apikey=user.apikey)
+
     except Organisation.DoesNotExist:
-        print('org doesnt exist')
+        #print('\n\n\norg doesnt exist\n\n\n')
         return render(request, 'main/alerts.html', context = {"snapshots":[]})
 
     user_snapshots = Snapshot.objects.filter(org =org)
@@ -413,11 +415,13 @@ def update_devices(dash,net_id):
         return
 
     for device in get_devices:
+        dev = None
+
         try:
             Device.objects.get(devSerial = device['serial'])
 
-            dev_to_update = Device.objects.filter(devSerial = device['serial'])
-            dev_to_update.update(
+            dev = Device.objects.filter(devSerial = device['serial'])
+            dev.update(
                 net = new_net,
 
                 devAddr   = device['address'],
@@ -429,9 +433,10 @@ def update_devices(dash,net_id):
                 devLat    = device['lat'],
                 devLong   = device['lng']
             )
+            dev.save()
 
         except Device.DoesNotExist:
-            new_device = Device.objects.create(
+            dev = Device.objects.create(
                 net = new_net,
 
                 devAddr   = device['address'],
@@ -444,7 +449,22 @@ def update_devices(dash,net_id):
                 devLat    = device['lat'],
                 devLong   = device['lng']
             )
-            new_device.save()
+            dev.save()
+
+        try:
+            device_model = dev.devModel
+
+            if device_model == "MV12N": #See if device is a camera
+                subprocess.Popen(
+                    ["python", "camera.py", device['serial']],    #Launch cron.py with device model
+                    stdin  = None,
+                    stdout = None,
+                    stderr = None,
+                    close_fds = True
+                )
+
+        except:
+            print("Error initialising camera")
 
 
 def edit_scanning_api_url(request):
