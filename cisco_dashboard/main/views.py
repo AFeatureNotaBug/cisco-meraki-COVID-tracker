@@ -4,8 +4,8 @@
 """
 import json
 import math
-import meraki
 import subprocess
+import meraki
 
 from django.shortcuts import render
 from django.shortcuts import redirect
@@ -463,7 +463,7 @@ def update_devices(dash,net_id):
                     close_fds = True
                 )
 
-        except:
+        except Device.DoesNotExist:
             print("Error initialising camera")
 
 
