@@ -152,3 +152,34 @@ class UseDemoKeyTest(TestCase):
         userprofile = UserProfile.objects.get(user=user)
         testdatabeta = {'apikey': 'demo'}
         self.assertEqual(userprofile.apikey, testdatabeta['apikey'])
+
+class AlertsTest(TestCase):
+    """ Tests alerts """
+    def test_alerts(self):
+        """ Tests alerts """
+        testprofile = {
+            'username': 'testuser',
+            'email': 'testuser@test.com',
+            'password': 'secret',
+            'apikey': 'testcase1'
+        }
+        self.client.post('/register/', testprofile, follow=True)
+        self.client.login(username=testprofile['username'], password=testprofile['password'])
+        res = self.client.post('/alerts', follow=True)
+        self.assertTrue(res.status_code == 200)
+
+
+class OverviewTest(TestCase):
+    """ Tests overview """
+    def test_overview(self):
+        """ Tests overview """
+        testprofile = {
+            'username': 'testuser',
+            'email': 'testuser@test.com',
+            'password': 'secret',
+            'apikey': 'demo'
+        }
+        self.client.post('/register/', testprofile, follow=True)
+        self.client.login(username=testprofile['username'], password=testprofile['password'])
+        res = self.client.get('/overview', follow=True)
+        self.assertTrue(res.status_code, 200)

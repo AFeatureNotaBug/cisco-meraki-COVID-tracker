@@ -10,7 +10,6 @@
 
 {% block body_block %}
 
-<h1>Login</h1>
 <div class="content">
     <div class="row flex-vert-center flex-grow justify-content-center" >
     <br style="line-height: 250px;">
@@ -27,11 +26,11 @@
                                 <form id="login_form" method="post" action="{% url 'login' %}">
                                     {% csrf_token %}
                                     {{ form|crispy }}
-                                    Username: <input type="text" name="username" value="" size="50" />
+                                    Username: <input type="text" name="username" value="" size="50" id='username' />
                                     <br />
-                                    Password: <input type="password" name="password" value="" size="50" />
+                                    Password: <input type="password" name="password" value="" size="50" id='password' />
                                     <br />
-                                    <input type="submit" value="submit" />
+                                    <input type="submit" value="submit" class='submit-button' />
                                 </form>
                             </div>
                         </form>

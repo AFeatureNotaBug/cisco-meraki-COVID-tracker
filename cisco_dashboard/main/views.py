@@ -2,8 +2,6 @@
  * Views file
  * Contains all views used in the Cisco Dashboard web app
 """
-
-import datetime
 import json
 import math
 import meraki
@@ -31,7 +29,10 @@ from main.models import Snapshot
 def index(request):
     """Index page view"""
     context_dict = {
-        'example_text': 'THIS IS EXAMPLE TEXT',
+        'users':len(UserProfile.objects.all()),
+        'networks':len(Network.objects.all()),
+        'orgs':len(Organisation.objects.all()),
+        'devices':len(Device.objects.all())
     }
 
     response = render(
@@ -58,14 +59,25 @@ def overview(request):
 
     context_dict = {
         'allOrgs':  Organisation.objects.filter(apikey = apikey),
-        'coords': dict()
+        'coords': dict(),
+        'networks':0,
+        'devices':0,
+        'aps':0,
+        'cameras':0,
     }
 
     for org in Organisation.objects.filter(apikey=apikey):
         context_dict[org.org_id] = Network.objects.filter(org = org)
 
         for net in list(Network.objects.filter(org = org)):
-            context_dict['coords'][net.net_id] = get_coords(request, net.scanningAPIURL)
+            context_dict['devices'] += len(Device.objects.filter(net=net))
+            for device in Device.objects.filter(net=net):
+                if device.devModel == 'MV12N':
+                    context_dict['cameras'] += 1
+                elif device.devModel =='MR30H':
+                    context_dict['aps'] +=1
+            context_dict['networks'] += 1
+            context_dict['coords'][net.net_id] = get_coords(net.scanningAPIURL)
 
     context_dict['coords'] = json.dumps(context_dict['coords'])
 
@@ -75,7 +87,14 @@ def overview(request):
 @login_required
 def alerts_page(request):
     """Alerts page"""
-    user_snapshots = Snapshot.objects.filter(user = request.user)
+    user = UserProfile.objects.get(user=request.user)
+    try:
+        org = Organisation.objects.get(apikey=user.apikey)
+    except Organisation.DoesNotExist:
+        print('org doesnt exist')
+        return render(request, 'main/alerts.html', context = {"snapshots":[]})
+
+    user_snapshots = Snapshot.objects.filter(org =org)
 
     context_dict = {
         "snapshots": list(user_snapshots)
@@ -112,7 +131,33 @@ def editapikey(request):
         apikey = request.POST['apikey']
     )
 
-    return render(request, 'main/profile.html',context={'error':error})
+    tmp_obj = json.loads(
+        serializers.serialize(
+            "json",
+            UserProfile.objects.filter(user = request.user)
+        )
+    )
+
+    retapikey = None
+    scanning_api_url = None
+
+    try:
+        apikey = tmp_obj[0]['fields']['apikey']
+        retapikey = (len(apikey) - 4) * '*' + apikey[-4:]
+        scanning_api_url = tmp_obj[0]['fields']['apikey']
+
+    except IndexError:
+        apikey = 'Not found'
+
+    context_dict = {
+        'email': request.user.email,
+        'username': request.user.username,
+        'apikey': retapikey,
+        'scanningAPIURL': scanning_api_url,
+        'error':error
+    }
+
+    return render(request, 'main/profile.html',context=context_dict)
 
 
 def register(request):
@@ -404,6 +449,18 @@ def update_devices(dash,net_id):
 
 def edit_scanning_api_url(request):
     """Allows user to edit their API key"""
+    if request.POST['scanningAPIURL'] in ("",None):
+        return ["Please set your scanning API URL in your profile"]
+    #creation of map comes here + business logic
+
+    body = {"key":"randominsert!!222_"}
+    resp = requests.post(request.POST['scanningAPIURL'], body, {"Content-Type":"application/json"})
+
+
+    try:
+        resp.json()
+    except json.decoder.JSONDecodeError:
+        return redirect('/overview')
     network_to_update = Network.objects.filter(net_id=request.POST['net_id'])
     network_to_update.update(
         scanningAPIURL = request.POST['scanningAPIURL']
@@ -412,7 +469,7 @@ def edit_scanning_api_url(request):
     return redirect('/overview')
 
 
-def get_coords(request, scanning_api_url):
+def get_coords(scanning_api_url):
     """ gets coordinates of scanning api url"""
     if scanning_api_url in ("",None):
         return ["Please set your scanning API URL in your profile"]
@@ -420,55 +477,25 @@ def get_coords(request, scanning_api_url):
 
     body = {"key":"randominsert!!222_"}
     resp = requests.post(scanning_api_url, body, {"Content-Type":"application/json"})
-    found = False
 
-    resp_json = resp.json()
+    try:
+        resp_json = resp.json()
+    except json.decoder.JSONDecodeError:
+        return []
     for outter in range(len(resp_json['body']['data']['observations'])):
         dist_list = []
         for inn in resp_json['body']['data']['observations']:
             long = resp_json['body']['data']['observations'][outter]['location']['lng']
             lat = resp_json['body']['data']['observations'][outter]['location']['lat']
             hav = haversine(long,lat,inn['location']['lng'],inn['location']['lat'])
-            if hav < 2:
+            if hav < 2 and hav == 0:
                 text = "<span style='color:red'>" + "%.2f" % hav
-                found = True
             else:
                 text = "<span style='color:green'>" + "%.2f" % hav
             text+= ' - ' + inn['clientMac'] + '</span>'
             dist_list.append(text)
 
         resp_json['body']['data']['observations'][outter]['distances'] = dist_list
-
-    if found:
-        #Create snapshot if more than one person in camera zone (entire frame)
-        tmp_obj = json.loads(
-            serializers.serialize(
-                "json",
-                UserProfile.objects.filter(user = request.user)
-            )
-        )
-
-        apikey = tmp_obj[0]['fields']['apikey'] #Get apikey
-        dash = meraki.DashboardAPI(apikey)
-
-        serial = "Q2EV-TWQP-G8VX"   #Temp hardcoded serial number for ben home camera
-
-        analytics_response = dash.camera.getDeviceCameraAnalyticsOverview(serial)
-
-        if analytics_response[0]['entrances'] > 1: #More than one person in zone
-            print(analytics_response[0]['entrances'], "ENTRANCES\n\n\n")
-            url_response = dash.camera.generateDeviceCameraSnapshot(serial) #Pic
-            current_time = datetime.datetime.now()
-
-            all_users = UserProfile.objects.filter(user = request.user)
-
-            for user_profile in all_users:
-                new_snapshot = Snapshot.objects.create(
-                    user = user_profile.user,
-                    url = url_response['url'],
-                    time = current_time.strftime("%c")
-                )
-                new_snapshot.save()
 
     return resp_json['body']['data']['observations']
 
