@@ -430,7 +430,6 @@ def get_coords(scanning_api_url):
             hav = haversine(long,lat,inn['location']['lng'],inn['location']['lat'])
             if hav < 2:
                 text = "<span style='color:red'>" + "%.2f" % hav
-                found = True
             else:
                 text = "<span style='color:green'>" + "%.2f" % hav
             text+= ' - ' + inn['clientMac'] + '</span>'
