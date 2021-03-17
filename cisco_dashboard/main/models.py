@@ -94,7 +94,10 @@ class Snapshot(models.Model):
      *  - url   - URL of the image
      *  - time  - time of collision
     """
-    org = models.ForeignKey(Organisation, on_delete=models.CASCADE)
+    org = models.ForeignKey(Organisation, on_delete = models.CASCADE)
 
     url = models.CharField(max_length=500)
     time = models.CharField(max_length=50)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
