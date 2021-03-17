@@ -74,7 +74,12 @@ def overview(request):
 def alerts_page(request):
     """Alerts page"""
     user = UserProfile.objects.get(user=request.user)
-    org = Organisation.objects.get(apikey=user.apikey)
+    try:
+        org = Organisation.objects.get(apikey=user.apikey)
+    except Organisation.DoesNotExist:
+        print('org doesnt exist')
+        return render(request, 'main/alerts.html', context = {"snapshots":[]})
+
     user_snapshots = Snapshot.objects.filter(org =org)
 
     context_dict = {
