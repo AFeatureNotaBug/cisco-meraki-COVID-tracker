@@ -98,6 +98,6 @@ class Snapshot(models.Model):
 
     url = models.CharField(max_length=500)
     time = models.CharField(max_length=50)
-    
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
