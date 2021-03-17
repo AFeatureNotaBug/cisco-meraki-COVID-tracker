@@ -38,14 +38,12 @@ def on_message(client, userData, msg):
         response = dash.camera.generateDeviceCameraSnapshot(serial, ts = timestamp)
 
         snapDevice = None
-        
-        try {
+
+        try:
             snapDevice = Device.objects.filter(devSerial = serial)[0]
-        
-        } except {
+
+        except:
             print("Device not found")
-            
-        }
 
         new_snapshot = Snapshot.objects.create(
             net = snapDevice.net.org,
