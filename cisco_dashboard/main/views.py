@@ -2,8 +2,6 @@
  * Views file
  * Contains all views used in the Cisco Dashboard web app
 """
-
-import datetime
 import json
 import math
 import meraki
@@ -65,7 +63,7 @@ def overview(request):
         context_dict[org.org_id] = Network.objects.filter(org = org)
 
         for net in list(Network.objects.filter(org = org)):
-            context_dict['coords'][net.net_id] = get_coords(request, net.scanningAPIURL)
+            context_dict['coords'][net.net_id] = get_coords(net.scanningAPIURL)
 
     context_dict['coords'] = json.dumps(context_dict['coords'])
 
@@ -75,7 +73,9 @@ def overview(request):
 @login_required
 def alerts_page(request):
     """Alerts page"""
-    user_snapshots = Snapshot.objects.filter(user = request.user)
+    user = UserProfile.objects.get(user=request.user)
+    org = Organisation.objects.get(apikey=user.apikey)
+    user_snapshots = Snapshot.objects.filter(org =org)
 
     context_dict = {
         "snapshots": list(user_snapshots)
@@ -412,7 +412,7 @@ def edit_scanning_api_url(request):
     return redirect('/overview')
 
 
-def get_coords(request, scanning_api_url):
+def get_coords(scanning_api_url):
     """ gets coordinates of scanning api url"""
     if scanning_api_url in ("",None):
         return ["Please set your scanning API URL in your profile"]
@@ -420,7 +420,6 @@ def get_coords(request, scanning_api_url):
 
     body = {"key":"randominsert!!222_"}
     resp = requests.post(scanning_api_url, body, {"Content-Type":"application/json"})
-    found = False
 
     resp_json = resp.json()
     for outter in range(len(resp_json['body']['data']['observations'])):
@@ -431,44 +430,12 @@ def get_coords(request, scanning_api_url):
             hav = haversine(long,lat,inn['location']['lng'],inn['location']['lat'])
             if hav < 2:
                 text = "<span style='color:red'>" + "%.2f" % hav
-                found = True
             else:
                 text = "<span style='color:green'>" + "%.2f" % hav
             text+= ' - ' + inn['clientMac'] + '</span>'
             dist_list.append(text)
 
         resp_json['body']['data']['observations'][outter]['distances'] = dist_list
-
-    if found:
-        #Create snapshot if more than one person in camera zone (entire frame)
-        tmp_obj = json.loads(
-            serializers.serialize(
-                "json",
-                UserProfile.objects.filter(user = request.user)
-            )
-        )
-
-        apikey = tmp_obj[0]['fields']['apikey'] #Get apikey
-        dash = meraki.DashboardAPI(apikey)
-
-        serial = "Q2EV-TWQP-G8VX"   #Temp hardcoded serial number for ben home camera
-
-        analytics_response = dash.camera.getDeviceCameraAnalyticsOverview(serial)
-
-        if analytics_response[0]['entrances'] > 1: #More than one person in zone
-            print(analytics_response[0]['entrances'], "ENTRANCES\n\n\n")
-            url_response = dash.camera.generateDeviceCameraSnapshot(serial) #Pic
-            current_time = datetime.datetime.now()
-
-            all_users = UserProfile.objects.filter(user = request.user)
-
-            for user_profile in all_users:
-                new_snapshot = Snapshot.objects.create(
-                    user = user_profile.user,
-                    url = url_response['url'],
-                    time = current_time.strftime("%c")
-                )
-                new_snapshot.save()
 
     return resp_json['body']['data']['observations']
 
