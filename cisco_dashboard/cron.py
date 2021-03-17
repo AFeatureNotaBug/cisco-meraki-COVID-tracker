@@ -8,6 +8,7 @@ django.setup()
 
 from main.models import Snapshot
 from main.models import Device
+from main.models import Network
 from datetime import datetime
 
 import paho.mqtt.client as mqtt
@@ -36,8 +37,18 @@ def on_message(client, userData, msg):
         timestamp = datetime.fromtimestamp(time.time()).isoformat()
         response = dash.camera.generateDeviceCameraSnapshot(serial, ts = timestamp)
 
+        snapDevice = None
+        
+        try {
+            snapDevice = Device.objects.filter(devSerial = serial)[0]
+        
+        } except {
+            print("Device not found")
+            
+        }
+
         new_snapshot = Snapshot.objects.create(
-            device = Device.objects.filter(devSerial = serial)[0],
+            net = snapDevice.net.org,
             url = response['url'],
             time = string(timestamp)
         )

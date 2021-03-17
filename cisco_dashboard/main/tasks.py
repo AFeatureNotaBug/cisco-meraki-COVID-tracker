@@ -38,25 +38,25 @@ def get_coords(scanning_api_url,apikey,serial):
 
         resp_json['body']['data']['observations'][outter]['distances'] = dist_list
 
-    if found:
+    #if found:
         #Create snapshot if more than one person in camera zone (entire frame)
-        dash = meraki.DashboardAPI(apikey)
+        #dash = meraki.DashboardAPI(apikey)
 
         #analytics_response = dash.camera.getDeviceCameraAnalyticsOverview(serial)
 
         #if analytics_response['entrances'] > 1: #More than one person in zone
-        url_response = dash.camera.generateDeviceCameraSnapshot(serial) #Pic
-        current_time = datetime.datetime.now()
+        #url_response = dash.camera.generateDeviceCameraSnapshot(serial) #Pic
+        #current_time = datetime.datetime.now()
 
-        all_users = UserProfile.objects.filter(apikey = apikey)
+        #all_users = UserProfile.objects.filter(apikey = apikey)
 
-        for user_profile in all_users:
-            new_snapshot = Snapshot.objects.create(
-                user = user_profile.user,
-                url = url_response['url'],
-                time = current_time.strftime("%c")
-            )
-            new_snapshot.save()
+        #for user_profile in all_users:
+            #new_snapshot = Snapshot.objects.create(
+                #user = user_profile.user,
+                #url = url_response['url'],
+                #time = current_time.strftime("%c")
+            #)
+            #new_snapshot.save()
 
     return resp_json['body']['data']['observations']
 
