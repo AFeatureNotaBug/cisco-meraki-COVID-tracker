@@ -90,11 +90,14 @@ class Device(models.Model):
 
 class Snapshot(models.Model):
     """Stores camera snapshots after collision detection
-     *  - org  - Network the snapshot belongs to
+     *  - org  - Organisation the snapshot belongs to
      *  - url   - URL of the image
      *  - time  - time of collision
     """
-    org = models.ForeignKey(Organisation, on_delete=models.CASCADE)
+    org = models.ForeignKey(Organisation, on_delete = models.CASCADE)
 
     url = models.CharField(max_length=500)
     time = models.CharField(max_length=50)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
