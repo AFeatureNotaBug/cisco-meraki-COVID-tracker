@@ -76,7 +76,7 @@ def alerts_page(request):
     user = UserProfile.objects.get(user=request.user)
     try:
         org = Organisation.objects.get(apikey=user.apikey)
-    except:
+    except Organisation.DoesNotExist:
         print('org doesnt exist')
         return render(request, 'main/alerts.html', context = {"snapshots":[]})
 
