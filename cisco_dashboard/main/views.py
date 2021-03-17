@@ -2,8 +2,6 @@
  * Views file
  * Contains all views used in the Cisco Dashboard web app
 """
-
-import datetime
 import json
 import math
 import meraki
@@ -65,7 +63,7 @@ def overview(request):
         context_dict[org.org_id] = Network.objects.filter(org = org)
 
         for net in list(Network.objects.filter(org = org)):
-            context_dict['coords'][net.net_id] = get_coords(request, net.scanningAPIURL)
+            context_dict['coords'][net.net_id] = get_coords(net.scanningAPIURL)
 
     context_dict['coords'] = json.dumps(context_dict['coords'])
 
@@ -414,7 +412,7 @@ def edit_scanning_api_url(request):
     return redirect('/overview')
 
 
-def get_coords(request, scanning_api_url):
+def get_coords(scanning_api_url):
     """ gets coordinates of scanning api url"""
     if scanning_api_url in ("",None):
         return ["Please set your scanning API URL in your profile"]
@@ -422,7 +420,6 @@ def get_coords(request, scanning_api_url):
 
     body = {"key":"randominsert!!222_"}
     resp = requests.post(scanning_api_url, body, {"Content-Type":"application/json"})
-    found = False
 
     resp_json = resp.json()
     for outter in range(len(resp_json['body']['data']['observations'])):
