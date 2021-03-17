@@ -71,13 +71,13 @@ def overview(request):
 
         for net in list(Network.objects.filter(org = org)):
             context_dict['devices'] += len(Device.objects.filter(net=net))
-            for d in Device.objects.filter(net=net):
-                if(d.devModel == 'MV12N'):
+            for device in Device.objects.filter(net=net):
+                if device.devModel == 'MV12N':
                     context_dict['cameras'] += 1
-                elif(d.devModel =='MR30H'):
+                elif device.devModel =='MR30H':
                     context_dict['aps'] +=1
             context_dict['networks'] += 1
-            context_dict['coords'][net.net_id] = get_coords(request, net.scanningAPIURL)
+            context_dict['coords'][net.net_id] = get_coords(net.scanningAPIURL)
 
     context_dict['coords'] = json.dumps(context_dict['coords'])
 
@@ -450,10 +450,10 @@ def edit_scanning_api_url(request):
 
     body = {"key":"randominsert!!222_"}
     resp = requests.post(request.POST['scanningAPIURL'], body, {"Content-Type":"application/json"})
-    found = False
+
 
     try:
-        resp_json = resp.json()
+        resp.json()
     except json.decoder.JSONDecodeError:
         return redirect('/overview')
     network_to_update = Network.objects.filter(net_id=request.POST['net_id'])
