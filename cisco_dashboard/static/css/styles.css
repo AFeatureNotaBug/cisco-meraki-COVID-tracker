@@ -137,3 +137,32 @@ a:hover{
 .register{
   background-color: #D5D8DE;
 }
+
+.overview-item{
+  flex: 1 1 0px;
+  display:flex;
+  flex-direction: column;
+  margin:10px;
+  padding:5px;
+  border-radius: 5px;
+  background-color: #4A5160;
+  color: #8A92A5;
+  
+}
+
+.card-body input{
+  background-color: transparent;
+  color: white;
+}
+
+.submit-button{
+  color: #67B346;
+}
+
+#username{
+  margin-bottom: 10px;
+}
+
+#password{
+  margin-bottom: 10px;
+}
