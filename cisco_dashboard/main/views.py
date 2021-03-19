@@ -6,9 +6,8 @@ import json
 import math
 import subprocess
 import time
-import meraki
-
 from datetime import datetime
+import meraki
 
 from django.shortcuts import render
 from django.shortcuts import redirect
@@ -432,20 +431,6 @@ def update_devices(dash,net_id):
 
             dev.devLat    = device['lat']
             dev.devLong   = device['lng']
-                
-            """dev = Device.objects.filter(devSerial = device['serial'])
-            dev.update(
-                net = new_net,
-
-                devAddr   = device['address'],
-                devSerial = device['serial'],
-                devMac    = device['mac'],
-                devModel  = device['model'],
-                #devLanIP  = device['lanIp'],
-
-                devLat    = device['lat'],
-                devLong   = device['lng']
-            )"""
 
         except Device.DoesNotExist:
             dev = Device.objects.create(
@@ -537,7 +522,9 @@ def get_coords(scanning_api_url):
                     text = "<span style='color:green'>" + "%.2f" % hav
 
                     new_access_alert = AccessAlert.objects.create(  #Add new AP alert
-                        org = Organisation.objects.filter(apikey = "4f9d726866f2cb8da55221caf1f46ba34293449c")[0],
+                        org = Organisation.objects.filter(
+                            apikey = "4f9d726866f2cb8da55221caf1f46ba34293449c"
+                            )[0],
                         dev_type_1 = outer['manufacturer'],
                         dev_type_2 = inn['manufacturer'],
                         time       = str(datetime.fromtimestamp(time.time()).isoformat())
