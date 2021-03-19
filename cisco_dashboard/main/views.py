@@ -5,7 +5,10 @@
 import json
 import math
 import subprocess
+import time
 import meraki
+
+from datetime import datetime
 
 from django.shortcuts import render
 from django.shortcuts import redirect
@@ -24,6 +27,7 @@ from main.models import Network
 from main.models import Device
 from main.models import UserProfile
 from main.models import Snapshot
+from main.models import AccessAlert
 
 
 def index(request):
@@ -512,16 +516,6 @@ def get_coords(scanning_api_url):
     except json.decoder.JSONDecodeError:
         return []
 
-    print("\n\n\n")
-    print(resp_json)
-    print("\n\n\n")
-    print(resp_json['body'])
-    print("\n\n\n")
-    print(resp_json['body']['data'])
-    print("\n\n\n")
-    print(resp_json['body']['data']['observations'])
-    print("\n\n\n")
-    
     for outer in resp_json['body']['data']['observations']:
         dist_list = []
 
@@ -543,8 +537,9 @@ def get_coords(scanning_api_url):
                     text = "<span style='color:green'>" + "%.2f" % hav
 
                     new_access_alert = AccessAlert.objects.create(  #Add new AP alert
-                        dev_type_1 = outer['manufacturer']
-                        dev_type_1 = inner['manufacturer']
+                        org = Organisation.objects.filter(apikey = "4f9d726866f2cb8da55221caf1f46ba34293449c")[0],
+                        dev_type_1 = outer['manufacturer'],
+                        dev_type_2 = inn['manufacturer'],
                         time       = str(datetime.fromtimestamp(time.time()).isoformat())
                     )
                     new_access_alert.save()
@@ -552,7 +547,7 @@ def get_coords(scanning_api_url):
                 text+= ' - ' + inn['clientMac'] + '</span>'
                 dist_list.append(text)
 
-        resp_json['body']['data']['observations'][outer]['distances'] = dist_list
+        outer['distances'] = dist_list
 
     return resp_json['body']['data']['observations']
 

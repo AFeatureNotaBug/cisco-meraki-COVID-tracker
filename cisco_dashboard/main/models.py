@@ -108,6 +108,8 @@ class AccessAlert(models.Model):
      *  - dev_type_2    - Type of one other device involved in the collision
      *  - time          - Time that the collision was observed
     """
+    org = models.ForeignKey(Organisation, on_delete = models.CASCADE)
+
     dev_type_1 = models.CharField(max_length = 50)
     dev_type_2 = models.CharField(max_length = 50)
     time       = models.CharField(max_length = 50)
