@@ -5,6 +5,9 @@
 import json
 import math
 import subprocess
+import time
+from datetime import datetime
+
 import meraki
 
 from django.shortcuts import render
@@ -24,6 +27,7 @@ from main.models import Network
 from main.models import Device
 from main.models import UserProfile
 from main.models import Snapshot
+from main.models import AccessAlert
 
 
 def index(request):
@@ -409,7 +413,8 @@ def update_devices(dash,net_id):
 
     try:
         get_devices = dash.networks.getNetworkDevices(net_id)
-        new_net= Network.objects.get(net_id=net_id)
+        new_net = Network.objects.get(net_id = net_id)
+
     except meraki.exceptions.APIError:
         print('401 api key invalid')
         return
@@ -418,22 +423,15 @@ def update_devices(dash,net_id):
         dev = None
 
         try:
-            Device.objects.get(devSerial = device['serial'])
+            dev = Device.objects.get(devSerial = device['serial'])
 
-            dev = Device.objects.filter(devSerial = device['serial'])
-            dev.update(
-                net = new_net,
+            dev.devAddr   = device['address']
+            dev.devSerial = device['serial']
+            dev.devMac    = device['mac']
+            dev.devModel  = device['model']
 
-                devAddr   = device['address'],
-                devSerial = device['serial'],
-                devMac    = device['mac'],
-                devModel  = device['model'],
-                #devLanIP  = device['lanIp'],
-
-                devLat    = device['lat'],
-                devLong   = device['lng']
-            )
-            dev.save()
+            dev.devLat    = device['lat']
+            dev.devLong   = device['lng']
 
         except Device.DoesNotExist:
             dev = Device.objects.create(
@@ -500,22 +498,44 @@ def get_coords(scanning_api_url):
 
     try:
         resp_json = resp.json()
+
     except json.decoder.JSONDecodeError:
         return []
-    for outter in range(len(resp_json['body']['data']['observations'])):
-        dist_list = []
-        for inn in resp_json['body']['data']['observations']:
-            long = resp_json['body']['data']['observations'][outter]['location']['lng']
-            lat = resp_json['body']['data']['observations'][outter]['location']['lat']
-            hav = haversine(long,lat,inn['location']['lng'],inn['location']['lat'])
-            if hav < 2 and hav == 0:
-                text = "<span style='color:red'>" + "%.2f" % hav
-            else:
-                text = "<span style='color:green'>" + "%.2f" % hav
-            text+= ' - ' + inn['clientMac'] + '</span>'
-            dist_list.append(text)
 
-        resp_json['body']['data']['observations'][outter]['distances'] = dist_list
+    for outer in resp_json['body']['data']['observations']:
+        dist_list = []
+
+        for inn in resp_json['body']['data']['observations']:
+
+            if outer != inn:
+                outer_long = outer['location']['lng']
+                outer_lat  = outer['location']['lat']
+
+                inner_long = inn['location']['lng']
+                inner_lat  = inn['location']['lat']
+
+                hav = haversine(outer_long, outer_lat, inner_long, inner_lat)
+
+                if hav < 2:# and hav == 0:
+                    text = "<span style='color:red'>" + "%.2f" % hav
+
+                    new_access_alert = AccessAlert.objects.create(  #Add new AP alert
+                        org = Organisation.objects.filter(
+                            apikey = "4f9d726866f2cb8da55221caf1f46ba34293449c"
+                            )[0],
+                        dev_type_1 = outer['manufacturer'],
+                        dev_type_2 = inn['manufacturer'],
+                        time       = str(datetime.fromtimestamp(time.time()).isoformat())
+                    )
+                    new_access_alert.save()
+
+                else:
+                    text = "<span style='color:green'>" + "%.2f" % hav
+
+                text+= ' - ' + inn['clientMac'] + '</span>'
+                dist_list.append(text)
+
+        outer['distances'] = dist_list
 
     return resp_json['body']['data']['observations']
 
