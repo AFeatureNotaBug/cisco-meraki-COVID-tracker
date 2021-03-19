@@ -93,10 +93,24 @@ class Snapshot(models.Model):
      *  - url   - URL of the image
      *  - time  - time of collision
     """
-    org = models.ForeignKey(Organisation, on_delete = models.CASCADE)
+    org  = models.ForeignKey(Organisation, on_delete = models.CASCADE)
 
-    url = models.CharField(max_length=500)
+    url  = models.CharField(max_length=500)
     time = models.CharField(max_length=50)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
+class AccessAlert(models.Model):
+    """Stores access point alerts for devices within two metres
+     *  - dev_type_1    - Type of one of the devices involved in the collision
+     *  - dev_type_2    - Type of one other device involved in the collision
+     *  - time          - Time that the collision was observed
+    """
+    dev_type_1 = models.CharField(max_length = 50)
+    dev_type_2 = models.CharField(max_length = 50)
+    time       = models.CharField(max_length = 50)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
