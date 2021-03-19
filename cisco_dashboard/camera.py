@@ -48,7 +48,7 @@ def on_message(client, userData, msg):
     * Callback function
     * Means client received publish message from MQTT broker
     """
-    if len(eval(msg.payload)['objects']) > 1:
+    if len(eval(msg.payload)['objects']) > 0:
         timestamp = datetime.fromtimestamp(time.time()).isoformat()
         response = dash.camera.generateDeviceCameraSnapshot(serial, ts = timestamp)
 

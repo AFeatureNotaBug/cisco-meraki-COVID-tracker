@@ -7,6 +7,7 @@ import math
 import subprocess
 import time
 from datetime import datetime
+
 import meraki
 
 from django.shortcuts import render
@@ -515,11 +516,8 @@ def get_coords(scanning_api_url):
 
                 hav = haversine(outer_long, outer_lat, inner_long, inner_lat)
 
-                if hav < 2 and hav == 0:
+                if hav < 2:# and hav == 0:
                     text = "<span style='color:red'>" + "%.2f" % hav
-
-                else:
-                    text = "<span style='color:green'>" + "%.2f" % hav
 
                     new_access_alert = AccessAlert.objects.create(  #Add new AP alert
                         org = Organisation.objects.filter(
@@ -530,6 +528,9 @@ def get_coords(scanning_api_url):
                         time       = str(datetime.fromtimestamp(time.time()).isoformat())
                     )
                     new_access_alert.save()
+
+                else:
+                    text = "<span style='color:green'>" + "%.2f" % hav
 
                 text+= ' - ' + inn['clientMac'] + '</span>'
                 dist_list.append(text)
