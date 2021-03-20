@@ -4,6 +4,10 @@
 """
 import json
 import math
+import subprocess
+import time
+from datetime import datetime
+
 import meraki
 
 from django.shortcuts import render
@@ -15,7 +19,6 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 import requests
 
-
 from main.forms import UserForm
 from main.forms import UserProfileForm
 
@@ -24,6 +27,7 @@ from main.models import Network
 from main.models import Device
 from main.models import UserProfile
 from main.models import Snapshot
+from main.models import AccessAlert
 
 
 def index(request):
@@ -88,10 +92,12 @@ def overview(request):
 def alerts_page(request):
     """Alerts page"""
     user = UserProfile.objects.get(user=request.user)
+
     try:
         org = Organisation.objects.get(apikey=user.apikey)
+
     except Organisation.DoesNotExist:
-        print('org doesnt exist')
+        #print('\n\n\norg doesnt exist\n\n\n')
         return render(request, 'main/alerts.html', context = {"snapshots":[]})
 
     user_snapshots = Snapshot.objects.filter(org =org)
@@ -407,31 +413,28 @@ def update_devices(dash,net_id):
 
     try:
         get_devices = dash.networks.getNetworkDevices(net_id)
-        new_net= Network.objects.get(net_id=net_id)
+        new_net = Network.objects.get(net_id = net_id)
+
     except meraki.exceptions.APIError:
         print('401 api key invalid')
         return
 
     for device in get_devices:
+        dev = None
+
         try:
-            Device.objects.get(devSerial = device['serial'])
+            dev = Device.objects.get(devSerial = device['serial'])
 
-            dev_to_update = Device.objects.filter(devSerial = device['serial'])
-            dev_to_update.update(
-                net = new_net,
+            dev.devAddr   = device['address']
+            dev.devSerial = device['serial']
+            dev.devMac    = device['mac']
+            dev.devModel  = device['model']
 
-                devAddr   = device['address'],
-                devSerial = device['serial'],
-                devMac    = device['mac'],
-                devModel  = device['model'],
-                #devLanIP  = device['lanIp'],
-
-                devLat    = device['lat'],
-                devLong   = device['lng']
-            )
+            dev.devLat    = device['lat']
+            dev.devLong   = device['lng']
 
         except Device.DoesNotExist:
-            new_device = Device.objects.create(
+            dev = Device.objects.create(
                 net = new_net,
 
                 devAddr   = device['address'],
@@ -444,7 +447,22 @@ def update_devices(dash,net_id):
                 devLat    = device['lat'],
                 devLong   = device['lng']
             )
-            new_device.save()
+            dev.save()
+
+        try:
+            device_model = dev.devModel
+
+            if device_model == "MV12N": #See if device is a camera
+                subprocess.Popen(
+                    ["python", "camera.py", device['serial']],    #Launch cron.py with device model
+                    stdin  = None,
+                    stdout = None,
+                    stderr = None,
+                    close_fds = True
+                )
+
+        except Device.DoesNotExist:
+            print("Error initialising camera")
 
 
 def edit_scanning_api_url(request):
@@ -480,22 +498,44 @@ def get_coords(scanning_api_url):
 
     try:
         resp_json = resp.json()
+
     except json.decoder.JSONDecodeError:
         return []
-    for outter in range(len(resp_json['body']['data']['observations'])):
-        dist_list = []
-        for inn in resp_json['body']['data']['observations']:
-            long = resp_json['body']['data']['observations'][outter]['location']['lng']
-            lat = resp_json['body']['data']['observations'][outter]['location']['lat']
-            hav = haversine(long,lat,inn['location']['lng'],inn['location']['lat'])
-            if hav < 2 and hav == 0:
-                text = "<span style='color:red'>" + "%.2f" % hav
-            else:
-                text = "<span style='color:green'>" + "%.2f" % hav
-            text+= ' - ' + inn['clientMac'] + '</span>'
-            dist_list.append(text)
 
-        resp_json['body']['data']['observations'][outter]['distances'] = dist_list
+    for outer in resp_json['body']['data']['observations']:
+        dist_list = []
+
+        for inn in resp_json['body']['data']['observations']:
+
+            if outer != inn:
+                outer_long = outer['location']['lng']
+                outer_lat  = outer['location']['lat']
+
+                inner_long = inn['location']['lng']
+                inner_lat  = inn['location']['lat']
+
+                hav = haversine(outer_long, outer_lat, inner_long, inner_lat)
+
+                if hav < 2:# and hav == 0:
+                    text = "<span style='color:red'>" + "%.2f" % hav
+
+                    new_access_alert = AccessAlert.objects.create(  #Add new AP alert
+                        org = Organisation.objects.filter(
+                            apikey = "4f9d726866f2cb8da55221caf1f46ba34293449c"
+                            )[0],
+                        dev_type_1 = outer['manufacturer'],
+                        dev_type_2 = inn['manufacturer'],
+                        time       = str(datetime.fromtimestamp(time.time()).isoformat())
+                    )
+                    new_access_alert.save()
+
+                else:
+                    text = "<span style='color:green'>" + "%.2f" % hav
+
+                text+= ' - ' + inn['clientMac'] + '</span>'
+                dist_list.append(text)
+
+        outer['distances'] = dist_list
 
     return resp_json['body']['data']['observations']
 
