@@ -42,6 +42,22 @@ The requirements for Python can be found on the [Python website](https://www.pyt
 
 ### Optional: Creating a Virtual Environment
 
+#### MacOS and Linux
+- Install virtualenv for the current user - `python3 -m pip install --user virtualenv`
+- Create the virtual environment - `python3 -m venv env`
+- Activate the virtual environment - `source env/bin/activate`
+- Deactivate the virtual environment - `deactivate`
+
+#### Windows
+- Install virtualenv for the current user - `python -m pip install --user virtualenv`
+- Create the virtual environment - `python -m venv env`
+- Activate the virtual environment - `.\env\Scripts\activate`
+- Deactivate the virutal environment - `deactivate`
+
+
+### Install requirements
+- To install all required Python packages, use the following command from the `cisco_dashboard` directory  
+`pip install -r requirements.txt`
 
 ### Initialising the Database
 The database must be created before the web app can be used. The default supported database in Django is SQLite, the following instructions relate to the default SQLite database.
