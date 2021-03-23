@@ -81,7 +81,7 @@ def overview(request):
                 elif device.devModel =='MR30H':
                     context_dict['aps'] +=1
             context_dict['networks'] += 1
-            context_dict['coords'][net.net_id] = get_coords(net.scanningAPIURL)
+            context_dict['coords'][net.net_id] = get_coords(apikey,net.scanningAPIURL)
 
     context_dict['coords'] = json.dumps(context_dict['coords'])
 
@@ -101,9 +101,12 @@ def alerts_page(request):
         return render(request, 'main/alerts.html', context = {"snapshots":[]})
 
     user_snapshots = Snapshot.objects.filter(org =org)
+    user_alerts = AccessAlert.objects.filter(org =org)
+
 
     context_dict = {
-        "snapshots": list(user_snapshots)
+        "snapshots": list(user_snapshots),
+        "alerts":list(user_alerts)
     }
 
     return render(request, 'main/alerts.html', context = context_dict)
@@ -487,9 +490,12 @@ def edit_scanning_api_url(request):
     return redirect('/overview')
 
 
-def get_coords(scanning_api_url):
+def get_coords(apikey,scanning_api_url):
     """ gets coordinates of scanning api url"""
     if scanning_api_url in ("",None):
+        return ["Please set your scanning API URL in your profile"]
+
+    if apikey in ("",None,"demo"):
         return ["Please set your scanning API URL in your profile"]
     #creation of map comes here + business logic
 
@@ -521,7 +527,7 @@ def get_coords(scanning_api_url):
 
                     new_access_alert = AccessAlert.objects.create(  #Add new AP alert
                         org = Organisation.objects.filter(
-                            apikey = "4f9d726866f2cb8da55221caf1f46ba34293449c"
+                            apikey = apikey
                             )[0],
                         dev_type_1 = outer['manufacturer'],
                         dev_type_2 = inn['manufacturer'],
