@@ -26,15 +26,17 @@ The requirements for Python can be found on the [Python website](https://www.pyt
 - Register an account via the [Cisco Meraki Dashboard](https://account.meraki.com/login/new_account)  
 - Create a network for your devices [[additional documentation from meraki](https://documentation.meraki.com/General_Administration/Organizations_and_Networks/Creating_and_Deleting_Dashboard_Networks)]
 - Claim your Meraki Devices by going to 'Organisation' -> 'Inventory' -> 'Claim' and typing in the serial numbers of the devices you would like to use
-- Configure your SSID for each device in a manor that you think is appropriate, it is recommended to use a password protected private network (WPA2-PSK).
-- You can now plug in the hardware
+- Configure your SSID for each device in a manor that you think is appropriate, it is recommended to use a password protected private network (WPA2-PSK).  
+![demo](/uploads/47395e2f86bcad45658b735bcae7a65b/image.png)
+- You can now plug the hardware in.
 
 ### Setting up the Hardware
 - To connect the access points, plug the PoE Injector into a outlet power socket, plug an ethernet connection into the 'Data In' and connect via ethernet an access point to the 'Data & Power Out', repeat this for the other access points.   
 - To connect a camera, from the powered ethernet output on an access point (labeled 1 and has a thunderbolt next to it, indicating power) connect via ethernet to the ethernet socket on the camera.
 
 ### Final steps
-- Via the Cisco Meraki Dashboard go to Wireless -> Port profiles and create a profile with the first port enabled and select the SSID you previously created. Apply this profile to all the access points that are connected to cameras.
+- Via the Cisco Meraki Dashboard go to Wireless -> Port profiles and create a profile with the first port enabled and select the SSID you previously created. Apply this profile to all the access points that are connected to cameras.  
+![image](/uploads/8a12b92487c51b162c7d7e4e1fa7ee86/image.png)
 - The hardware should auto-connect and update the firmware in a few minutes.
 
 [Helpful YouTube video](https://www.youtube.com/watch?v=uI7AUpQIWco&t=451s)
