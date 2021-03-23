@@ -24,12 +24,11 @@ serial = None
 
 try:
     serial = sys.argv[1]
-
 except:
     print("No serial provided")
     sys.exit(0)
 
-key    = "4f9d726866f2cb8da55221caf1f46ba34293449c"
+key    = "a9041abdc45d9958066f0476fb24595a9a878e85"
 dash = meraki.DashboardAPI(key)
 
 
@@ -38,8 +37,9 @@ def on_connect(client, userData, flags, rc):
     * Callback function for client connection
     * Means a CONNACK was received
     """
-    #client.subscribe("/merakimv/Q2EV-TWQP-G8VX/raw_detections")
-    client.subscribe("/merakimv/" + serial + "/raw_detections")
+    client.subscribe("/merakimv/Q2EV-PJ88-64G8/raw_detections")
+    #print("/merakimv/" + serial + "/raw_detections")
+    #client.subscribe("/merakimv/" + serial + "/raw_detections")
 
 
 previous_time = None
@@ -48,6 +48,7 @@ def on_message(client, userData, msg):
     * Callback function
     * Means client received publish message from MQTT broker
     """
+    print('asd')
     if len(eval(msg.payload)['objects']) > 0:
         timestamp = datetime.fromtimestamp(time.time()).isoformat()
         response = dash.camera.generateDeviceCameraSnapshot(serial, ts = timestamp)
