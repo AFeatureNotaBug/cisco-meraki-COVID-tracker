@@ -3,8 +3,15 @@ The following guide attempts to generalise the installation and setup process of
 
 ## Recommended Hardware
 Below is a list of hardware that the team used when designing the project. (Note: You will also require a Meraki license in order to use the hardware):
-- 6 Meraki MR30H Cloud Managed Access Points
-- 3 Meraki MV12 Mini Dome Cameras
+#### Hardware
+- 6 Meraki MR30H Cloud Managed Access Points (MR30H-HW)
+- 3 Meraki MV12 Mini Dome HD Cameras (MV12N-HW)
+- 6 Meraki 802.3at PoE Injector (MA-INJ-4-UK)
+- 16 Ethernet Cables
+
+#### Licenses
+- 3 Meraki MV Enterprise License and Support
+- 3 Meraki MR Enterprise License
 
 ## Required Software
 - Python 3.6 or later
@@ -15,11 +22,42 @@ Below is a list of hardware that the team used when designing the project. (Note
 The requirements for Python can be found on the [Python website](https://www.python.org/)
 
 ## Setup
+### Setting up the Meraki account
+- Register an account via the [Cisco Meraki Dashboard](https://account.meraki.com/login/new_account)  
+- Create a network for your devices [[additional documentation from meraki](https://documentation.meraki.com/General_Administration/Organizations_and_Networks/Creating_and_Deleting_Dashboard_Networks)]
+- Claim your Meraki Devices by going to 'Organisation' -> 'Inventory' -> 'Claim' and typing in the serial numbers of the devices you would like to use
+- Configure your SSID for each device in a manor that you think is appropriate, it is recommended to use a password protected private network (WPA2-PSK).
+- You can now plug in the hardware
+
 ### Setting up the Hardware
+- To connect the access points, plug the PoE Injector into a outlet power socket, plug an ethernet connection into the 'Data In' and connect via ethernet an access point to the 'Data & Power Out', repeat this for the other access points.   
+- To connect a camera, from the powered ethernet output on an access point (labeled 1 and has a thunderbolt next to it, indicating power) connect via ethernet to the ethernet socket on the camera.
+
+### Final steps
+- Via the Cisco Meraki Dashboard go to Wireless -> Port profiles and create a profile with the first port enabled and select the SSID you previously created. Apply this profile to all the access points that are connected to cameras.
+- The hardware should auto-connect and update the firmware in a few minutes.
+
+[Helpful YouTube video](https://www.youtube.com/watch?v=uI7AUpQIWco&t=451s)
 
 
 ### Optional: Creating a Virtual Environment
 
+#### MacOS and Linux
+- Install virtualenv for the current user - `python3 -m pip install --user virtualenv`
+- Create the virtual environment - `python3 -m venv env`
+- Activate the virtual environment - `source env/bin/activate`
+- Deactivate the virtual environment - `deactivate`
+
+#### Windows
+- Install virtualenv for the current user - `python -m pip install --user virtualenv`
+- Create the virtual environment - `python -m venv env`
+- Activate the virtual environment - `.\env\Scripts\activate`
+- Deactivate the virutal environment - `deactivate`
+
+
+### Install requirements
+- To install all required Python packages, use the following command from the `cisco_dashboard` directory  
+`pip install -r requirements.txt`
 
 ### Initialising the Database
 The database must be created before the web app can be used. The default supported database in Django is SQLite, the following instructions relate to the default SQLite database.
