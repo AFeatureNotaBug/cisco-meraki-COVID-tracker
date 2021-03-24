@@ -189,16 +189,13 @@ def register(request):
             profile_form = profile_form.save(commit = False)
             profile_form.user = user
             profile_form.save()
-
             registered = True
-
-        else:
-            print(user_form.errors, profile_form.errors)
-
     else:
         user_form = UserForm()
         profile_form = UserProfileForm()
 
+    if registered:
+        return redirect('/login')
     context_dict = {
         'user_form': user_form,
         'profile_form': profile_form,
