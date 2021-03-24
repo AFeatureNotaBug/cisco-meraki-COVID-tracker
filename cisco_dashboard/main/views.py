@@ -192,20 +192,22 @@ def register(request):
 
             registered = True
 
-        else:
-            print(user_form.errors, profile_form.errors)
+        
 
     else:
         user_form = UserForm()
         profile_form = UserProfileForm()
 
-    context_dict = {
-        'user_form': user_form,
-        'profile_form': profile_form,
-        'registered': registered
-    }
+    if registered:
+        return redirect('/login')
+    else:
+        context_dict = {
+            'user_form': user_form,
+            'profile_form': profile_form,
+            'registered': registered
+        }
 
-    return render(request, 'main/register.html', context = context_dict)
+        return render(request, 'main/register.html', context = context_dict)
 
 
 def user_login(request):
