@@ -113,6 +113,7 @@ class AccessAlert(models.Model):
     dev_type_1 = models.CharField(max_length = 50)
     dev_type_2 = models.CharField(max_length = 50)
     time       = models.CharField(max_length = 50)
+    distance = models.CharField(max_length = 10,default=.1)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

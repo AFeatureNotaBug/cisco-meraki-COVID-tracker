@@ -6,27 +6,44 @@
 {% endblock %}
 
 {% block body_block %}
-<h1>Alerts</h1>
-
-<h3>Major Alerts</h3>
 <div style='display:flex;flex-wrap: wrap;'>
-{% for snap in snapshots %}
-	<div class="card mb-3" style="flex:46%; margin:1%">
-		<div class="row g-0">
-		  <div class="col-md-7">
-			<div class="card-body">
-			  <h5 class="card-title">Snaphsot Alert</h5>
-			  <p class="card-text">An alert was triggered at {{ snap.user }} and a Snaphot was taken.</p>
-			  <a href={{ snap.url }} class="btn btn-primary">Full Image</a>
-			  <p class="card-text"><small class="text-muted">Snap taken at {{ snap.time }}</small></p>
+	<div class="col mb-6">
+		<h3>Major Alerts</h3>
+		{% for snap in snapshots %}
+		<div class="card mb-3" style="width: 100%">
+			<div class="row g-0">
+			<div class="col-md-7">
+				<div class="card-body">
+				<h5 class="card-title">Snaphsot Alerts</h5>
+				<p class="card-text">An alert was triggered at {{ snap.user }} and a Snaphot was taken.</p>
+				<a href={{ snap.url }} class="btn btn-primary">Full Image</a>
+				<p class="card-text"><small class="text-muted">Snap taken at {{ snap.time }}</small></p>
+				</div>
 			</div>
-		  </div>
-		  <div class="col-md-5">
-			<img src="{{ snap.url }}" alt="Card image capture" class="card-img-top embed-responsive-item">
-		  </div>
+			<div class="col-md-5">
+				<img src="{{ snap.url }}" alt="Card image capture" class="card-img-top embed-responsive-item">
+			</div>
+			</div>
 		</div>
-	  </div>
-{% endfor %}
+		{% endfor %}
+	</div>
+	<div class="col mb-6">
+		<h3>Minor Alerts</h3>
+		{% for alert in alerts %}
+		<div class="card mb-3" style="width: 100%;">
+			<div class="row g-0">
+			<div class="col">
+				<div class="card-body">
+				<h5 class="card-title">Access Point Alerts</h5>
+				<p class="card-text">Device 1 - {{ alert.dev_type_1 }} | Device 2 - {{ alert.dev_type_2 }}</p>
+				<p class="card-text">Distance: {{ alert.distance }}m</p>
+				<p class="card-text"><small class="text-muted">Snap taken at {{ alert.time }}</small></p>
+				</div>
+			</div>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
 </div>
 
 {% endblock %}
