@@ -196,7 +196,6 @@ def register(request):
 
     if registered:
         return redirect('/login')
-    
     context_dict = {
         'user_form': user_form,
         'profile_form': profile_form,
