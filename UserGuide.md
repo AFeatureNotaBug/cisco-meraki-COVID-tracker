@@ -77,16 +77,22 @@ The web app can be run and hosted locally by navigating to the cisco\_dashboard 
 ### Using the Web App
 If the command ```python manage.py runserver``` executes successfully, you may navigate to the URL "127.0.0.1:8000" by default in order to view the web app when hosted locally.
 
-From here you may wish to register an account with your Meraki API key. Guidance on allowing API access and generating an API key for your Meraki Dashboard can be found [here](https://documentation.meraki.com/General_Administration/Other_Topics/Cisco_Meraki_Dashboard_API) ```IMAGE FOR ACCOUNT CREATION HERE```
+From here you may wish to register an account with your Meraki API key. Guidance on allowing API access and generating an API key for your Meraki Dashboard can be found [here](https://documentation.meraki.com/General_Administration/Other_Topics/Cisco_Meraki_Dashboard_API). ![image](/uploads/5d0d7e11baaf5fc1eb8752b4ef8324a0/image.png)
 
-After creating an account and logging in, the overview page will be populated with your Meraki organisation details once visited. Initial load times may be slow, this is due to the system populating the database with all obtainable Meraki details based on your API key, on later visits to the overview page these details will be updated and load times will be much shorter. ```IMAGE OF POPULATED OVERVIEW PAGE```.
+After creating an account and logging in, the overview page will be populated with your Meraki organisation details once visited. Initial load times may be slow, this is due to the system populating the database with all obtainable Meraki details based on your API key, on later visits to the overview page these details will be updated and load times will be much shorter.
+![image](/uploads/05827f6c47e08d04a88fd7e8e6b8f1e3/image.png)
 
 ### Collision Detection
-```IMAGE OF SCANNING API URL INPUT BOX``` ```DETAILS ABOUT SETTING UP LISTENING SERVER``` Once the listening server is created, the URL can be entered into the field on the Overview page which will then populate the database with details of device positions.
+![image](/uploads/084eb5a2b01154f0a33ff14ad145390c/image.png)
+```DETAILS ABOUT SETTING UP LISTENING SERVER``` Once the listening server is created, the URL can be entered into the field on the Overview page which will then populate the database with details of device positions. The image below shows positions of network devices as red pins on the overview page's map:
+![image](/uploads/ee5c06f044a547be9d594fd9e55cd52d/image.png)
 
-When devices are detected as being within two metres of one another, a minor alert will be flagged in the system and a relevant camera will be checked to see if it has detected people within two metres of one another. If the camera has detected two or more people within two metres of one another, the alert will be moved into the "major alerts" category and a picture will be grabbed from the camera. If the camera has not detected two or more people within two metres of one another, the alert will remain in the "minor alerts" category.
+The cameras may also be connected to an MQTT broker via the Cisco Meraki Dashboard on the "Settings" tab and then the "Sense" tab of the camera details page.
+![image](/uploads/583c9f5dee2f02cb23fe03819de85101/image.png)
+![image](/uploads/0d91c31f444a7fa615435b2939b5155e/image.png)
+Once connected to the MQTT broker the web app will subscribe to raw detection updates from the cameras, these raw updates will trigger an image capture upon reaching a defined room capacity.
 
-The cameras may also be connected to an MQTT broker. [IMAGE OF MQTT broker setup]. Once connected to the MQTT broker the web app will subscribe to raw detection updates from the cameras, these raw updates will trigger an image capture upon reaching a defined room capacity.
+Alerts are separated into two categories, access point alerts and camera alerts. Access points are able to detect distances between devices, and therefore will be able to flag any devices within two metres of one another. Access point alerts provide details about the time of the breach and the offending devices. The smart cameras can detect people but are not so capable of determining distances between objects within the frame, therefore the cameras are more suited to enforcing room capacity limits. Camera alerts will provide a time and an image of the frame when it reaches a defined capacity.
 
 Alerts, as described above, may be viewed on the Alerts page. ```IMAGE OF ALERTS PAGE```
 
