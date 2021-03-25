@@ -83,13 +83,19 @@ After creating an account and logging in, the overview page will be populated wi
 ![image](/uploads/05827f6c47e08d04a88fd7e8e6b8f1e3/image.png)
 
 ### Collision Detection
+```DETAILS ABOUT SETTING UP LISTENING SERVER```
+
+Once the listening server is created, the URL can be entered into the field on the Overview page which will then populate the database with details of device positions.
 ![image](/uploads/084eb5a2b01154f0a33ff14ad145390c/image.png)
-```DETAILS ABOUT SETTING UP LISTENING SERVER``` Once the listening server is created, the URL can be entered into the field on the Overview page which will then populate the database with details of device positions. The image below shows positions of network devices as red pins on the overview page's map:
+
+The image below shows positions of network devices as red pins on the overview page's map:
 ![image](/uploads/ee5c06f044a547be9d594fd9e55cd52d/image.png)
 
 The cameras may also be connected to an MQTT broker via the Cisco Meraki Dashboard on the "Settings" tab and then the "Sense" tab of the camera details page.
 ![image](/uploads/583c9f5dee2f02cb23fe03819de85101/image.png)
+
 ![image](/uploads/0d91c31f444a7fa615435b2939b5155e/image.png)
+
 Once connected to the MQTT broker the web app will subscribe to raw detection updates from the cameras, these raw updates will trigger an image capture upon reaching a defined room capacity.
 
 Alerts are separated into two categories, access point alerts and camera alerts. Access points are able to detect distances between devices, and therefore will be able to flag any devices within two metres of one another. Access point alerts provide details about the time of the breach and the offending devices. The smart cameras can detect people but are not so capable of determining distances between objects within the frame, therefore the cameras are more suited to enforcing room capacity limits. Camera alerts will provide a time and an image of the frame when it reaches a defined capacity.
