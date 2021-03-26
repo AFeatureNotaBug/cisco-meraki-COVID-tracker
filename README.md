@@ -41,7 +41,7 @@ Issues and their priorities and associated risks were determined by the team on 
 - [Cisco Meraki Scanning API](https://documentation.meraki.com/MR/Monitoring_and_Reporting/Scanning_API)
 - Cisco Meraki MR30H Cloud Managed Access Points
 - Cisco Meraki MV12 Mini Dome Cameras
-- Listening Server
+- Google cloud functions & Firestore
 
 ## User Guide
 A guide detailing how users can set up the project on their own hardware can be found [here](UserGuide.md).
@@ -70,6 +70,6 @@ After successfully navigating to the login page the user can then enter their cr
 
 ![image](/uploads/47f52beb9e4a6995fb4206b970d7323c/image.png)
 
-Congradulations, you have successfully managed to register and login to the Cisco Meraki Dashboard.
+Congratulations, you have successfully managed to register and login to the Cisco Meraki Dashboard.
 
 ![image](/uploads/c5e0046c3e18b773bece7349c23d0aab/image.png)
