@@ -21,6 +21,7 @@ import paho.mqtt.client as mqtt
 
 
 serial = None
+key    = None
 
 try:
     serial = sys.argv[1]
@@ -28,8 +29,13 @@ except:
     print("No serial provided")
     sys.exit(0)
 
-key    = "a9041abdc45d9958066f0476fb24595a9a878e85"
-dash = meraki.DashboardAPI(key)
+try:
+    key = sys.argv[2]
+except:
+    print("No API key provided")
+    sys.exit(0)
+
+dash = meraki.DashboardAPI(key, output_log = False, print_console = False, suppress_logging = False)
 
 
 def on_connect(client, userData, flags, rc):
@@ -37,9 +43,7 @@ def on_connect(client, userData, flags, rc):
     * Callback function for client connection
     * Means a CONNACK was received
     """
-    client.subscribe("/merakimv/Q2EV-PJ88-64G8/raw_detections")
-    #print("/merakimv/" + serial + "/raw_detections")
-    #client.subscribe("/merakimv/" + serial + "/raw_detections")
+    client.subscribe("/merakimv/" + serial + "/raw_detections")
 
 
 previous_time = None
@@ -48,8 +52,7 @@ def on_message(client, userData, msg):
     * Callback function
     * Means client received publish message from MQTT broker
     """
-    print('asd')
-    if len(eval(msg.payload)['objects']) > 0:
+    if len(eval(msg.payload)['objects']) >= 0:
         timestamp = datetime.fromtimestamp(time.time()).isoformat()
         response = dash.camera.generateDeviceCameraSnapshot(serial, ts = timestamp)
 
@@ -59,7 +62,6 @@ def on_message(client, userData, msg):
             try:
                 snapDevice = Device.objects.filter(devSerial = serial)[0]
                 snapOrg = snapDevice.net.org
-                print("Got snapOrg and Device")
 
                 new_snapshot = Snapshot.objects.create(
                     org = snapOrg,
