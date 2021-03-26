@@ -101,7 +101,9 @@ Once connected to the MQTT broker the web app will subscribe to raw detection up
 
 Alerts are separated into two categories, access point alerts and camera alerts. Access points are able to detect distances between devices, and therefore will be able to flag any devices within two metres of one another. Access point alerts provide details about the time of the breach and the offending devices. The smart cameras can detect people but are not so capable of determining distances between objects within the frame, therefore the cameras are more suited to enforcing room capacity limits. Camera alerts will provide a time and an image of the frame when it reaches a defined capacity.
 
-Alerts, as described above, may be viewed on the Alerts page. ```IMAGE OF ALERTS PAGE```
+Alerts, as described above, may be viewed on the Alerts page shown here:
+
+![image](/uploads/1b4f510263ac59738c4358b8f358aed5/image.png)
 
 
 
