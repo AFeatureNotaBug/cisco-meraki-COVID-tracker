@@ -454,7 +454,7 @@ def update_devices(dash,net_id):
 
             if device_model == "MV12N": #See if device is a camera
                 subprocess.Popen(
-                    ["python", "camera.py", device['serial']],    #Launch cron.py with device model
+                    ["python", "camera.py", device['serial'], dev.net.org.apikey],    #Launch cron.py with device serial and api key
                     stdin  = None,
                     stdout = None,
                     stderr = None,
