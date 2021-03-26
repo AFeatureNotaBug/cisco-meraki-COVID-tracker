@@ -83,7 +83,8 @@ After creating an account and logging in, the overview page will be populated wi
 ![image](/uploads/05827f6c47e08d04a88fd7e8e6b8f1e3/image.png)
 
 ### Collision Detection
-```DETAILS ABOUT SETTING UP LISTENING SERVER```
+To setup the collision server [this file](https://stgit.dcs.gla.ac.uk/tp3-2020-CS11/cs11-main/-/blob/master/cloud_functions/listener.js) is required to be uploaded to a Google Cloud Function and you also need to create a Firestore named `Cisco`.  You also need to add the generated url of this cloud function to the Cisco Meraki Dashboard -> Network-Wide -> General under the 'Location and scanning' title.  
+![image](/uploads/54f6efa2fee62f41ad5f77c4e040ec3d/image.png)
 
 Once the listening server is created, the URL can be entered into the field on the Overview page which will then populate the database with details of device positions.
 ![image](/uploads/084eb5a2b01154f0a33ff14ad145390c/image.png)
