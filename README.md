@@ -45,31 +45,3 @@ Issues and their priorities and associated risks were determined by the team on 
 
 ## User Guide
 A guide detailing how users can set up the project on their own hardware can be found [here](UserGuide.md).
-
-## Screenshots and Demonstrations
-To begin using our application users will have to register and login to take advantage of all of its features.
-
-Registration can be accessed by the appropriate link, displayed in the top right of the home page after launching the site.
-
-![image](/uploads/8adab12951473c66f5edf6a165134315/image.png)
-
-Following the highlighted link will lead to the page displayed below. In this demonstration example credentials have been provided for each image to to aid in the users understanding.
-In this example we will use:
-- Username: "userdemo"
-- Email: "demo@demo.com"
-- Password: "demopass"
-- Apikey: "demoapikey"
-
- In practical use more appropriate credentials should be used to ensure the security of accounts. For the purposes of this demonstration we will not be providing a functional apikey during the registraion phase to avoid confusion, since this information can be updated after creating a profile.
-
-![image](/uploads/5415b09aa1c0da0b0931923b2deb0ab0/image.png)
-
-The user can now attempt to login. This process can be started by navigating to the login page using the appropriate link highlighted in the top right corner of the home page.
-
-After successfully navigating to the login page the user can then enter their credentials. An example of this using the registration demo credentials has been provided.
-
-![image](/uploads/47f52beb9e4a6995fb4206b970d7323c/image.png)
-
-Congratulations, you have successfully managed to register and login to the Cisco Meraki Dashboard.
-
-![image](/uploads/c5e0046c3e18b773bece7349c23d0aab/image.png)
