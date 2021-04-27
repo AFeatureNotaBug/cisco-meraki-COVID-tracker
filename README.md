@@ -1,14 +1,4 @@
-# CS11 Team Project - Cisco Meraki Dashboard
-## Contributors
-| Name | Role | Email |
-| ------ | ------ | ------ |
-| Johnathan Dominick Sciallo | Checker | 2326843s@student.gla.ac.uk |
-| Fraser Dale | Demonstrator | 2387625d@student.gla.ac.uk |
-| Jake Haakanson | Note Taker | 2407682H@student.gla.ac.uk |
-| Ruofan Guo | Checker | 2431011g@student.gla.ac.uk |
-| Ben Lynch | Meeting Chair | 2381564l@student.gla.ac.uk |
-| Ollie Gardner | Team Coach | 2310049G@student.gla.ac.uk |
-
+# Group CS11 Team Project - Cisco Meraki COVID Tracker
 ## Project Overview
 Cisco Systems is a California-based multinational technology company well known for its contributions to networking technology. Meraki, a cloud-managed IT company, was acquired by Cisco Systems in 2012 as part of their cloud networking group. Cisco Meraki's cloud architecture allows users and businesses to create and deploy secure and scalable networks that can be managed from anywhere.
 
